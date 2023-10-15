@@ -29,3 +29,7 @@ Vector4& Vector4::operator=(const Vector4 &ref) {
 	this->w = ref.w;
 	return *this;
 }
+
+float	Vector4::dot(Vector4 const &ref) {
+	return (ref.x * this->x + ref.y * this->y + ref.z * this->z + ref.w * this->w);
+}
