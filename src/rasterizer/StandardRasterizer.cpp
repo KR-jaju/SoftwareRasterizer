@@ -35,11 +35,11 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c)
 	Vector3 tmp_b = toScreenSpace(b.position, this->width, this->height);
 	Vector3 tmp_c = toScreenSpace(c.position, this->width, this->height);
 	float slope1 = (tmp_a.x - tmp_b.x) / (tmp_a.y - tmp_b.y);
-	float slope2 = (a.position.getX() - c.position.getX()) / (a.position.getY() - b.position.getY());
+	float slope2 = (tmp_a.x - tmp_c.x) / (tmp_a.y - tmp_c.y);
 
-	float tmpX = a.position.getX();
+	float tmpX = tmp_a.x;
 	float tmpX2 = tmpX;
-	for (int i = int(a.position.getY()); i <= int(b.position.getY()); i++)
+	for (int i = int(tmp_a.y); i <= int(tmp_b.y); i++)
 	{
 		for (int j = min(tmpX, tmpX2); j <= max(tmpX, tmpX2); j++)
 			color[j + this->width * i] = 0x0000FF00;
@@ -47,10 +47,10 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c)
 		tmpX2 += slope2;
 	}
 
-	slope1 = (c.position.getX() - b.position.getX()) / (c.position.getY() - b.position.getY());
-	tmpX = c.position.getX();
+	slope1 = (tmp_c.x - tmp_b.x) / (tmp_c.y - tmp_b.y);
+	tmpX = tmp_c.x;
 	tmpX2 = tmpX;
-	for (int i = int(c.position.y); i >= int(b.position.y); i--)
+	for (int i = int(tmp_c.y); i >= int(tmp_b.y); i--)
 	{
 		for (int j = min(tmpX, tmpX2); j <= max(tmpX, tmpX2); j++)
 			color[j + this->width * i] = 0X0000FF00;
