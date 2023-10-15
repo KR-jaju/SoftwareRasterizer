@@ -3,6 +3,7 @@
 
 Level::Level(int width, int height) {
 	data = new LevelData[width * height];
+	std::cout << "hello" << std::endl;
 }
 
 
