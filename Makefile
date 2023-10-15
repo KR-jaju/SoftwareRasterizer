@@ -4,11 +4,15 @@ SRC = main.cpp
 OBJ = $(SRC:.cpp=.o)
 NAME = rasterizer
 LIBMLX = ./mlx/libmlx.a
+ADD = 
 
 %.o : %.cpp
-	$(CXX) $(CXXFLAGS) -I. -c -o $@ $<
+	$(CXX) $(CXXFLAGS) $(ADD) -I. -c -o $@ $<
 
 all : $(NAME)
+
+debug :
+	make re ADD=-g
 
 $(LIBMLX) :
 	make -C ./mlx
