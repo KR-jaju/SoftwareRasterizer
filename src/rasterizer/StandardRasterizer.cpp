@@ -74,17 +74,17 @@ StandardRasterizer::~StandardRasterizer()
 }
 
 
-static
-inline float crossWidth(Vector3 &a, Vector3 &b, Vector3 &c) 
-{
-	return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
-}
+// static
+// inline float crossWidth(Vector3 &a, Vector3 &b, Vector3 &c) 
+// {
+// 	return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+// }
 
 static bool cmp(Vertex &v1, Vertex &v2)
 {
 	if (v1.position.y < v2.position.y)
-		return true;
-	return false;
+		return false;
+	return true;
 }
 
 void StandardRasterizer::draw(Mesh &mesh, int count)
@@ -94,7 +94,7 @@ void StandardRasterizer::draw(Mesh &mesh, int count)
 	{
 		vec.clear();
 		for (int j = i; j < i + 3; j++)
-			vec.push_back(mesh.get(i));
+			vec.push_back(mesh.get(j));
 		std::sort(vec.begin(), vec.end(), cmp);
 		this->drawTriangle(vec[0], vec[1], vec[2]);
 	}
