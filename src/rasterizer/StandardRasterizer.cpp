@@ -1,16 +1,16 @@
 
-#include "rasterizer/StandardRasterizer.hpp"
+#include "rasterizer/BarycentricRasterizer.hpp"
 #include "math/Vector3.hpp"
 #include <cmath>
 
-StandardRasterizer::StandardRasterizer(int width, int height) {
+BarycentricRasterizer::BarycentricRasterizer(int width, int height) {
 	this->width = width;
 	this->height = height;
 	this->color = new int[width * height];
 	this->depth = new float[width * height];
 }
 
-StandardRasterizer::~StandardRasterizer() {
+BarycentricRasterizer::~BarycentricRasterizer() {
 	delete[] this->color;
 	delete[] this->depth;
 }
@@ -51,7 +51,7 @@ inline float	cross(Vector3 &a, Vector3 &b, Vector3 &c) {
 	return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
 }
 
-void	StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c) {
+void	BarycentricRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c) {
 	Vector3	screen_a = toScreenSpace(a.position, this->width, this->height);
 	Vector3	screen_b = toScreenSpace(b.position, this->width, this->height);
 	Vector3 screen_c = toScreenSpace(c.position, this->width, this->height);
@@ -75,13 +75,13 @@ void	StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c) {
 	}
 }
 
-void	StandardRasterizer::draw(Mesh &mesh, int count) {
+void	BarycentricRasterizer::draw(Mesh &mesh, int count) {
 	for (int i = 0; i + 3 <= count; i += 3) {
 		this->drawTriangle(mesh.get(i), mesh.get(i + 1), mesh.get(i + 2));
 	}
 }
 
-void	StandardRasterizer::blit(int *dst) {
+void	BarycentricRasterizer::blit(int *dst) {
 	for (int y = 0; y < this->height; y++)
 		for (int x = 0; x < this->width; x++)
 			dst[x + y * this->width] = this->color[x + y * this->width];
