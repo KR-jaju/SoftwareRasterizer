@@ -1,107 +1,87 @@
-#include "rasterizer/StandardRasterizer.hpp"
+
+#include "rasterizer/BarycentricRasterizer.hpp"
 #include "math/Vector3.hpp"
 #include <cmath>
-#include <vector>
 
-int min(int x1, int x2)
-{
-	if (x1 < x2)
-		return x1;
-	return x2;
-}
-
-int max(int x1, int x2)
-{
-	if (x1 > x2)
-		return x1;
-	return x2;
-}
-
-static
-inline Vector3	toScreenSpace(Vector3 a, int width, int height) 
-{
-	a.x = (a.x * 0.5f + 0.5f) * width + 0.5f;
-	a.y = (-a.y * 0.5f + 0.5f) * height + 0.5f;
-	return (a);
-}
-
-void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c)
-{
-	for (int i = 0; i < this->height; i++)
-		for (int j = 0; j < this->width; j++)
-			this->color[j + i * this->width] = 0x00000000;
-	
-	Vector3 tmp_a = toScreenSpace(a.position, this->width, this->height);
-	Vector3 tmp_b = toScreenSpace(b.position, this->width, this->height);
-	Vector3 tmp_c = toScreenSpace(c.position, this->width, this->height);
-	float slope1 = (tmp_a.x - tmp_b.x) / (tmp_a.y - tmp_b.y);
-	float slope2 = (a.position.getX() - c.position.getX()) / (a.position.getY() - b.position.getY());
-
-	float tmpX = a.position.getX();
-	float tmpX2 = tmpX;
-	for (int i = int(a.position.getY()); i <= int(b.position.getY()); i++)
-	{
-		for (int j = min(tmpX, tmpX2); j <= max(tmpX, tmpX2); j++)
-			color[j + this->width * i] = 0x0000FF00;
-		tmpX += slope1;
-		tmpX2 += slope2;
-	}
-
-	slope1 = (c.position.getX() - b.position.getX()) / (c.position.getY() - b.position.getY());
-	tmpX = c.position.getX();
-	tmpX2 = tmpX;
-	for (int i = int(c.position.y); i >= int(b.position.y); i--)
-	{
-		for (int j = min(tmpX, tmpX2); j <= max(tmpX, tmpX2); j++)
-			color[j + this->width * i] = 0X0000FF00;
-		tmpX -= slope1;
-		tmpX2 -= slope2;
-	}
-}
-
-StandardRasterizer::StandardRasterizer(int width, int height)
-{
+BarycentricRasterizer::BarycentricRasterizer(int width, int height) {
 	this->width = width;
 	this->height = height;
 	this->color = new int[width * height];
 	this->depth = new float[width * height];
 }
 
-StandardRasterizer::~StandardRasterizer()
-{
+BarycentricRasterizer::~BarycentricRasterizer() {
 	delete[] this->color;
 	delete[] this->depth;
 }
 
+static
+float	min(float a, float b, float c) {
+	if (a > b)
+		a = b;
+	if (a > c)
+		a = c;
+	return (a);
+}
 
 static
-inline float crossWidth(Vector3 &a, Vector3 &b, Vector3 &c) 
-{
+float	max(float a, float b, float c) {
+	if (a < b)
+		a = b;
+	if (a < c)
+		a = c;
+	return (a);
+}
+
+// static
+// inline void	toNDC(Vector3 &a, int width, int height) {
+// 	a.x = ((a.x - 0.5f) / width) * 2 - 1;
+// 	a.y = ((a.y - 0.5f) / height) * 2 - 1;
+// }
+
+static
+inline Vector3	toScreenSpace(Vector3 a, int width, int height) {
+	a.x = (a.x * 0.5f + 0.5f) * width + 0.5f;
+	a.y = (-a.y * 0.5f + 0.5f) * height + 0.5f;
+	return (a);
+}
+
+static
+inline float	cross(Vector3 &a, Vector3 &b, Vector3 &c) {
 	return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
 }
 
-static bool cmp(Vertex &v1, Vertex &v2)
-{
-	if (v1.position.y < v2.position.y)
-		return true;
-	return false;
-}
+void	BarycentricRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c) {
+	Vector3	screen_a = toScreenSpace(a.position, this->width, this->height);
+	Vector3	screen_b = toScreenSpace(b.position, this->width, this->height);
+	Vector3 screen_c = toScreenSpace(c.position, this->width, this->height);
+	int		x_min = static_cast<int>(roundf(min(screen_a.x, screen_b.x, screen_c.x)));
+	int		x_max = static_cast<int>(roundf(max(screen_a.x, screen_b.x, screen_c.x)));
+	int		y_min = static_cast<int>(roundf(min(screen_a.y, screen_b.y, screen_c.y)));
+	int		y_max = static_cast<int>(roundf(max(screen_a.y, screen_b.y, screen_c.y)));
+	float	area = cross(screen_a, screen_b, screen_c);
 
-void StandardRasterizer::draw(Mesh &mesh, int count)
-{
-	std::vector<Vertex> vec;
-	for (int i = 0; i + 3 <= count; i += 3)
-	{
-		vec.clear();
-		for (int j = i; j < i + 3; j++)
-			vec.push_back(mesh.get(i));
-		std::sort(vec.begin(), vec.end(), cmp);
-		this->drawTriangle(vec[0], vec[1], vec[2]);
+	for (int y = y_min; y <= y_max; y++) {
+		for (int x = x_min; x <= x_max; x++) {
+			Vector3	p(x, y, 0);
+			float	u = cross(screen_b, screen_c, p) / area;
+			float	v = cross(screen_c, screen_a, p) / area;
+			float	w = 1 - u - v;
+			if (0 <= u && u <= 1 && 0 <= v && v <= 1 && 0 <= w && w <= 1)
+				this->color[x + y * this->width] = 0x00ffffff;
+			else
+				this->color[x + y * this->width] = 0x00000000;
+		}
 	}
 }
 
-void StandardRasterizer::blit(int *dst)
-{
+void	BarycentricRasterizer::draw(Mesh &mesh, int count) {
+	for (int i = 0; i + 3 <= count; i += 3) {
+		this->drawTriangle(mesh.get(i), mesh.get(i + 1), mesh.get(i + 2));
+	}
+}
+
+void	BarycentricRasterizer::blit(int *dst) {
 	for (int y = 0; y < this->height; y++)
 		for (int x = 0; x < this->width; x++)
 			dst[x + y * this->width] = this->color[x + y * this->width];
