@@ -2,12 +2,11 @@
 #ifndef VECTOR3_HPP
 # define VECTOR3_HPP
 
-class Vector3 {
-private:
+struct Vector3 {
 	float	x;
 	float	y;
 	float	z;
-public:
+	Vector3();
 	Vector3(float x, float y, float z);
 };
 

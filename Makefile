@@ -1,13 +1,13 @@
 CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98
-SRC = main.cpp
+SRC = main.cpp $(wildcard src/*.cpp) $(wildcard src/*/*.cpp)
 OBJ = $(SRC:.cpp=.o)
 NAME = rasterizer
 LIBMLX = ./mlx/libmlx.a
 ADD = 
 
 %.o : %.cpp
-	$(CXX) $(CXXFLAGS) $(ADD) -I. -c -o $@ $<
+	$(CXX) $(CXXFLAGS) $(ADD) -I./include -c -o $@ $<
 
 all : $(NAME)
 

@@ -8,6 +8,7 @@ class Attribute {
 protected:
 	Vector3 position;
 public:
+	virtual Attribute	mix();
 };
 
 #endif
