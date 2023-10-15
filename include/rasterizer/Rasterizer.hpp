@@ -8,7 +8,7 @@ class Rasterizer {
 protected:
 	Rasterizer() {}
 public:
-	virtual	~Rasterizer() = 0;
+	virtual	~Rasterizer() {};
 	virtual void	draw(Mesh &mesh, int count) = 0;
 	virtual void	blit(int *dst) = 0;
 };
