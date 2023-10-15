@@ -1,6 +1,8 @@
 
 #include "rasterizer/BarycentricRasterizer.hpp"
 #include "math/Vector3.hpp"
+#include "math/Color.hpp"
+#include "rasterizer/Shader.hpp"
 #include <cmath>
 
 BarycentricRasterizer::BarycentricRasterizer(int width, int height) {
@@ -51,7 +53,7 @@ inline float	cross(Vector3 &a, Vector3 &b, Vector3 &c) {
 	return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
 }
 
-void	BarycentricRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c) {
+void	BarycentricRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *shader) {
 	Vector3	screen_a = toScreenSpace(a.position, this->width, this->height);
 	Vector3	screen_b = toScreenSpace(b.position, this->width, this->height);
 	Vector3 screen_c = toScreenSpace(c.position, this->width, this->height);
@@ -68,16 +70,14 @@ void	BarycentricRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c) {
 			float	v = cross(screen_c, screen_a, p) / area;
 			float	w = 1 - u - v;
 			if (0 <= u && u <= 1 && 0 <= v && v <= 1 && 0 <= w && w <= 1)
-				this->color[x + y * this->width] = 0x00ffffff;
-			else
-				this->color[x + y * this->width] = 0x00000000;
+				shader->fragment(v, this->color[x + y * this->width]);
 		}
 	}
 }
 
-void	BarycentricRasterizer::draw(Mesh &mesh, int count) {
+void	BarycentricRasterizer::draw(Mesh &mesh, int count, Shader *shader) {
 	for (int i = 0; i + 3 <= count; i += 3) {
-		this->drawTriangle(mesh.get(i), mesh.get(i + 1), mesh.get(i + 2));
+		this->drawTriangle(mesh[i], mesh[i + 1], mesh[i + 2]);
 	}
 }
 
