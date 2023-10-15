@@ -26,10 +26,3 @@ Vector3& Vector3::operator=(const Vector3 &ref) {
 	return *this;
 }
 
-float Vector3::getX() { return x; }
-	float Vector3::getY() { return y; }
-	float Vector3::getZ() { return z; }
-	void Vector3::setX(float x) { this->x = x; }
-	void Vector3::setY(float y) { this->y = y; }
-	void Vector3::setZ(float z) { this->z = z; }
-

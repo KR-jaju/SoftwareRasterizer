@@ -11,12 +11,6 @@ public:
 	Vector3(float x, float y, float z);
 	Vector3(const Vector3 &ref);
 	Vector3& operator=(const Vector3 &ref);
-	float getX();
-	float getY();
-	float getZ();
-	void setX(float x);
-	void setY(float y);
-	void setZ(float z);
 };
 
 #endif
