@@ -10,3 +10,6 @@ Vertex	&Mesh::get(int idx) {
 	return (this->vertices[idx]);
 }
 
+Vertex	&Mesh::operator[](int idx){
+	return (this->vertices[idx]);	
+}
