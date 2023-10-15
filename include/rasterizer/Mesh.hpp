@@ -12,6 +12,7 @@ public:
 	Mesh(int size);
 	int		getSize();
 	Vertex	&get(int idx);
+	Vertex	&operator[](int idx);
 };
 
 #endif
