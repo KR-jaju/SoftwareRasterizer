@@ -50,8 +50,10 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 	area = cross(tmp_a, tmp_b, tmp_c);
 	for (int i = int(tmp_a.y); i <= int(tmp_b.y); i++)
 	{
+		if (i < 0 || i > height) continue;
 		for (int j = min(tmpX, tmpX2); j <= max(tmpX, tmpX2); j++)
 		{	
+			if (j < 0 || j > width) continue;
 			Vector4 p(j, i, 0, 0);
 			u = cross(tmp_b, tmp_c, p) / area;
 			v = cross(tmp_c, tmp_a, p) / area;
@@ -72,8 +74,10 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 	tmpX2 = tmpX;
 	for (int i = int(tmp_c.y); i >= int(tmp_b.y); i--)
 	{
+		if (i < 0 || i > height) continue;
 		for (int j = min(tmpX, tmpX2); j <= max(tmpX, tmpX2); j++)
 		{
+			if (j < 0 || j > width) continue;
 			Vector4 p(j, i, 0, 0);
 			u = cross(tmp_b, tmp_c, p) / area;
 			v = cross(tmp_c, tmp_a, p) / area;
