@@ -4,6 +4,7 @@
 #include "math/Color.hpp"
 #include "rasterizer/Shader.hpp"
 #include <cmath>
+#include <algorithm>
 
 BarycentricRasterizer::BarycentricRasterizer(int width, int height) {
 	this->width = width;
@@ -57,10 +58,10 @@ void	BarycentricRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader
 	Vector4	screen_a = toScreenSpace(a.position, this->width, this->height);
 	Vector4	screen_b = toScreenSpace(b.position, this->width, this->height);
 	Vector4 screen_c = toScreenSpace(c.position, this->width, this->height);
-	int		x_min = static_cast<int>(roundf(min(screen_a.x, screen_b.x, screen_c.x)));
-	int		x_max = static_cast<int>(roundf(max(screen_a.x, screen_b.x, screen_c.x)));
-	int		y_min = static_cast<int>(roundf(min(screen_a.y, screen_b.y, screen_c.y)));
-	int		y_max = static_cast<int>(roundf(max(screen_a.y, screen_b.y, screen_c.y)));
+	int		x_min = std::max(static_cast<int>(roundf(min(screen_a.x, screen_b.x, screen_c.x))), 0);
+	int		x_max = std::min(static_cast<int>(roundf(max(screen_a.x, screen_b.x, screen_c.x))), this->width - 1);
+	int		y_min = std::max(static_cast<int>(roundf(min(screen_a.y, screen_b.y, screen_c.y))), 0);
+	int		y_max = std::min(static_cast<int>(roundf(max(screen_a.y, screen_b.y, screen_c.y))), this->height - 1);
 	float	area = cross(screen_a, screen_b, screen_c);
 
 	for (int y = y_min; y <= y_max; y++) {
