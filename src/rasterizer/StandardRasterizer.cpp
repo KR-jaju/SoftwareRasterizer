@@ -18,7 +18,7 @@ int max(int x1, int x2)
 }
 
 static
-inline Vector3	toScreenSpace(Vector3 a, int width, int height) 
+inline Vector4	toScreenSpace(Vector4 a, int width, int height) 
 {
 	a.x = (a.x * 0.5f + 0.5f) * width + 0.5f;
 	a.y = (-a.y * 0.5f + 0.5f) * height + 0.5f;
@@ -31,9 +31,9 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c)
 		for (int j = 0; j < this->width; j++)
 			this->color[j + i * this->width] = 0x00000000;
 	
-	Vector3 tmp_a = toScreenSpace(a.position, this->width, this->height);
-	Vector3 tmp_b = toScreenSpace(b.position, this->width, this->height);
-	Vector3 tmp_c = toScreenSpace(c.position, this->width, this->height);
+	Vector4 tmp_a = toScreenSpace(a.position, this->width, this->height);
+	Vector4 tmp_b = toScreenSpace(b.position, this->width, this->height);
+	Vector4 tmp_c = toScreenSpace(c.position, this->width, this->height);
 	float slope1 = (tmp_a.x - tmp_b.x) / (tmp_a.y - tmp_b.y);
 	float slope2 = (tmp_a.x - tmp_c.x) / (tmp_a.y - tmp_c.y);
 

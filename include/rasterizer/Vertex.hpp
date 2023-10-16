@@ -2,10 +2,10 @@
 #ifndef VERTEX_HPP
 # define VERTEX_HPP
 
-# include "math/Vector3.hpp"
+# include "math/Vector4.hpp"
 
 struct Vertex {
-	Vector3	position;
+	Vector4	position;
 };
 
 #endif

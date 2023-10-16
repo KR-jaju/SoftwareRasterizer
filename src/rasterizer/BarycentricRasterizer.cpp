@@ -42,14 +42,14 @@ float	max(float a, float b, float c) {
 // }
 
 static
-inline Vector3	toScreenSpace(Vector3 a, int width, int height) {
+inline Vector4	toScreenSpace(Vector4 a, int width, int height) {
 	a.x = (a.x * 0.5f + 0.5f) * width + 0.5f;
 	a.y = (-a.y * 0.5f + 0.5f) * height + 0.5f;
 	return (a);
 }
 
 static
-inline float	cross(Vector3 &a, Vector3 &b, Vector3 &c) {
+inline float	cross(Vector4 &a, Vector4 &b, Vector4 &c) {
 	return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
 }
 
@@ -62,9 +62,9 @@ inline Vertex	mix(Vertex const &a, Vertex const &b, Vertex const &c, float ratio
 }
 
 void	BarycentricRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *shader) {
-	Vector3	screen_a = toScreenSpace(a.position, this->width, this->height);
-	Vector3	screen_b = toScreenSpace(b.position, this->width, this->height);
-	Vector3 screen_c = toScreenSpace(c.position, this->width, this->height);
+	Vector4	screen_a = toScreenSpace(a.position, this->width, this->height);
+	Vector4	screen_b = toScreenSpace(b.position, this->width, this->height);
+	Vector4 screen_c = toScreenSpace(c.position, this->width, this->height);
 	int		x_min = static_cast<int>(roundf(min(screen_a.x, screen_b.x, screen_c.x)));
 	int		x_max = static_cast<int>(roundf(max(screen_a.x, screen_b.x, screen_c.x)));
 	int		y_min = static_cast<int>(roundf(min(screen_a.y, screen_b.y, screen_c.y)));
@@ -73,7 +73,7 @@ void	BarycentricRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader
 
 	for (int y = y_min; y <= y_max; y++) {
 		for (int x = x_min; x <= x_max; x++) {
-			Vector3	p(x, y, 0);
+			Vector4	p(x, y, 0, 1);
 			float	u = cross(screen_b, screen_c, p) / area;
 			float	v = cross(screen_c, screen_a, p) / area;
 			float	w = 1 - u - v;
@@ -86,8 +86,13 @@ void	BarycentricRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader
 }
 
 void	BarycentricRasterizer::draw(Mesh &mesh, int count, Shader *shader) {
+	Vertex	clip_space[3];
+
 	for (int i = 0; i + 3 <= count; i += 3) {
-		this->drawTriangle(mesh[i], mesh[i + 1], mesh[i + 2], shader);
+		shader->vertex(mesh[i], clip_space[0]);
+		shader->vertex(mesh[i + 1], clip_space[1]);
+		shader->vertex(mesh[i + 2], clip_space[2]);
+		this->drawTriangle(clip_space[0], clip_space[1], clip_space[2], shader);
 	}
 }
 
