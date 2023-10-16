@@ -15,6 +15,7 @@ private:
 public:
 	StandardRasterizer(int width, int height);
 	virtual ~StandardRasterizer();
+	bool	depthTest(float d, int idx);
 	void	draw(Mesh &mesh, int count, Shader *shader);
 	void	blit(int *dst);
 };

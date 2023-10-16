@@ -31,6 +31,16 @@ inline Vector4	toScreenSpace(Vector4 a, int width, int height)
 	return (a);
 }
 
+bool StandardRasterizer::depthTest(float d, int idx)
+{
+	if (depth[idx] > d)
+	{
+		depth[idx] = d;
+		return true;
+	}
+	return false;
+}
+
 void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *shader)
 {
 	for (int i = 0; i < this->height; i++)
@@ -63,6 +73,7 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 			pw = w / c.position.w;
 			pa = pu + pv + pw;
 			Vertex fragment = Vertex::mix(a, b, c, pu / pa, pv / pa, pw / pa);
+			if (depthTest(fragment.position.z, j + this->width * i) == false) continue;
 			shader->fragment(fragment, color[j + this->width * i]);
 		}
 		tmpX += slope1;
@@ -87,6 +98,7 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 			pw = w / c.position.w;
 			pa = pu + pv + pw;
 			Vertex fragment = Vertex::mix(a, b, c, pu / pa, pv / pa, pw / pa);
+			if (depthTest(fragment.position.z, j + this->width * i) == false) continue;
 			shader->fragment(fragment, color[j + this->width * i]);
 		}
 		tmpX -= slope1;
@@ -100,6 +112,8 @@ StandardRasterizer::StandardRasterizer(int width, int height)
 	this->height = height;
 	this->color = new int[width * height];
 	this->depth = new float[width * height];
+	for (int i = 0; i < width * height; i++)
+		depth[i] = 1;
 }
 
 StandardRasterizer::~StandardRasterizer()
