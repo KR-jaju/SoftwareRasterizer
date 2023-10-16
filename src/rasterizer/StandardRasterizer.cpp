@@ -87,8 +87,9 @@ static bool cmp(Vertex &v1, Vertex &v2)
 	return true;
 }
 
-void StandardRasterizer::draw(Mesh &mesh, int count)
+void StandardRasterizer::draw(Mesh &mesh, int count, Shader *shader)
 {
+	(void) shader;
 	std::vector<Vertex> vec;
 	for (int i = 0; i + 3 <= count; i += 3)
 	{

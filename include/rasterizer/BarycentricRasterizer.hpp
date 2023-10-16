@@ -11,11 +11,11 @@ private:
 	int		height;
 	int		*color;
 	float	*depth;
-	void	drawTriangle(Vertex &a, Vertex &b, Vertex &c);
+	void	drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *shader);
 public:
 	BarycentricRasterizer(int width, int height);
 	virtual	~BarycentricRasterizer();
-	void	draw(Mesh &mesh, int count);
+	void	draw(Mesh &mesh, int count, Shader *shader);
 	void	blit(int *dst);
 };
 

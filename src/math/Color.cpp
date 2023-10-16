@@ -14,7 +14,7 @@ Color::operator	int() const {
 	int const	g = static_cast<int>(roundf(this->g * 255)) & 0xff;
 	int const	b = static_cast<int>(roundf(this->b * 255)) & 0xff;
 	int const	a = static_cast<int>(roundf(this->a * 255)) & 0xff;
-	return (a << 24 | b << 16 | g << 8 | r);
+	return (a << 24 | r << 16 | g << 8 | b);
 }
 
 

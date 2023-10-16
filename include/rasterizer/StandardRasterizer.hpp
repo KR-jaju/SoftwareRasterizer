@@ -15,7 +15,7 @@ private:
 public:
 	StandardRasterizer(int width, int height);
 	virtual ~StandardRasterizer();
-	void	draw(Mesh &mesh, int count);
+	void	draw(Mesh &mesh, int count, Shader *shader);
 	void	blit(int *dst);
 };
 

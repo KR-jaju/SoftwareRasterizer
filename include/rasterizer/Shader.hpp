@@ -9,8 +9,8 @@ class Shader {
 protected:
 	Shader() {}
 public:
-	virtual void	vertex(Vertex &vertex);
-	virtual void	fragment(Vertex &in, int &color);
+	virtual void	vertex(Vertex const &in, Vertex &out) = 0;
+	virtual void	fragment(Vertex const &in, int &color) = 0;
 };
 
 #endif
