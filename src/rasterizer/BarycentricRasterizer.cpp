@@ -38,11 +38,16 @@ float	max(float a, float b, float c) {
 	return (a);
 }
 
-// static
-// inline void	toNDC(Vector3 &a, int width, int height) {
-// 	a.x = ((a.x - 0.5f) / width) * 2 - 1;
-// 	a.y = ((a.y - 0.5f) / height) * 2 - 1;
-// }
+static
+inline Vertex	toNDC(Vertex const &clip_space) {
+	Vertex	ret;
+
+	ret = clip_space;
+	ret.position.x /= ret.position.w;
+	ret.position.y /= ret.position.w;
+	ret.position.z /= ret.position.w;
+	return (ret);
+}
 
 static
 inline Vector4	toScreenSpace(Vector4 a, int width, int height) {
@@ -82,11 +87,7 @@ void	BarycentricRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader
 			float	v = cross(screen_c, screen_a, p) / area;
 			float	w = 1 - u - v;
 			if (0 <= u && u <= 1 && 0 <= v && v <= 1 && 0 <= w && w <= 1) {
-				float	pu = u / a.position.w;
-				float	pv = v / b.position.w;
-				float	pw = w / c.position.w;
-				float	pa = pu + pv + pw;
-				Vertex	fragment = Vertex::mix(a, b, c, pu / pa,  pv / pa, pw / pa);
+				Vertex	fragment = Vertex::mix(a, b, c, u, v, w);
 				if (!this->depthTest(x, y, fragment))
 					continue;
 				shader->fragment(fragment, this->color[x + y * this->width]);
@@ -95,17 +96,29 @@ void	BarycentricRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader
 	}
 }
 
-void	BarycentricRasterizer::draw(Mesh &mesh, int count, Shader *shader) {
-	Vertex	clip_space[3];
+		// clip_space[0].position = clip_space[0].position / clip_space[0].position.w;
+		// clip_space[1].position = clip_space[1].position / clip_space[1].position.w;
+		// clip_space[2].position = clip_space[2].position / clip_space[2].position.w;
+
+void	BarycentricRasterizer::draw(Mesh &mesh, int count, Shader *shader, Clipper *clipper) {
+	Vertex				clip_space[3];
+	std::queue<Vertex>	clipped;
 
 	for (int i = 0; i + 3 <= count; i += 3) {
-		shader->vertex(mesh[i], clip_space[0]);
-		shader->vertex(mesh[i + 1], clip_space[1]);
-		shader->vertex(mesh[i + 2], clip_space[2]);
-		clip_space[0].position = clip_space[0].position / clip_space[0].position.w;
-		clip_space[1].position = clip_space[1].position / clip_space[1].position.w;
-		clip_space[2].position = clip_space[2].position / clip_space[2].position.w;
-		this->drawTriangle(clip_space[0], clip_space[1], clip_space[2], shader);
+		for (int j = 0; j < 3; j++)
+			shader->vertex(mesh[i + j], clip_space[j]);
+		clipper->clip(clipped, clip_space[0], clip_space[1], clip_space[2]);
+		if (clipped.empty())
+			continue;
+		Vertex	root = clipped.front();
+		clipped.pop();
+		Vertex	prev = clipped.front();
+		clipped.pop();
+		while (!clipped.empty()) {
+			this->drawTriangle(root, prev, clipped.front(), shader);
+			prev = clipped.front();
+			clipped.pop();
+		}
 	}
 }
 

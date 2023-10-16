@@ -16,7 +16,7 @@ private:
 public:
 	BarycentricRasterizer(int width, int height);
 	virtual	~BarycentricRasterizer();
-	void	draw(Mesh &mesh, int count, Shader *shader);
+	void	draw(Mesh &mesh, int count, Shader *shader, Clipper *clipper);
 	void	blit(int *dst);
 };
 
