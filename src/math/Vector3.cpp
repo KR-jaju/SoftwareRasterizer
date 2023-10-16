@@ -94,3 +94,7 @@ Vector3	Vector3::normalized() const {
 	return (ret / ret.length());
 }
 
+Vector3::operator Color() const {
+	return (Color (this->x, this->y, this->z, 0));
+}
+

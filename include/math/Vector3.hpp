@@ -2,6 +2,8 @@
 #ifndef VECTOR3_HPP
 # define VECTOR3_HPP
 
+# include "./Color.hpp"
+
 struct Vector3 {
 	float	x;
 	float	y;
@@ -21,6 +23,7 @@ public:
 	float	lengthSqr() const;
 	float	length() const;
 	Vector3	normalized() const;
+	operator	Color() const;
 };
 
 #endif
