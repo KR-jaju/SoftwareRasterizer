@@ -11,6 +11,8 @@ BarycentricRasterizer::BarycentricRasterizer(int width, int height) {
 	this->height = height;
 	this->color = new int[width * height];
 	this->depth = new float[width * height];
+	for (int i = 0; i < width * height; i++)
+		this->depth[i] = 1;
 }
 
 BarycentricRasterizer::~BarycentricRasterizer() {
@@ -54,6 +56,15 @@ inline float	cross(Vector4 &a, Vector4 &b, Vector4 &c) {
 	return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
 }
 
+bool	BarycentricRasterizer::depthTest(int x, int y, Vertex const &fragment) {
+	float	&storedDepth = this->depth[x + y * this->width];
+
+	if (storedDepth <= fragment.position.z)
+		return (false);
+	storedDepth = fragment.position.z;
+	return (true);
+}
+
 void	BarycentricRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *shader) {
 	Vector4	screen_a = toScreenSpace(a.position, this->width, this->height);
 	Vector4	screen_b = toScreenSpace(b.position, this->width, this->height);
@@ -76,6 +87,8 @@ void	BarycentricRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader
 				float	pw = w / c.position.w;
 				float	pa = pu + pv + pw;
 				Vertex	fragment = Vertex::mix(a, b, c, pu / pa,  pv / pa, pw / pa);
+				if (!this->depthTest(x, y, fragment))
+					continue;
 				shader->fragment(fragment, this->color[x + y * this->width]);
 			}
 		}
