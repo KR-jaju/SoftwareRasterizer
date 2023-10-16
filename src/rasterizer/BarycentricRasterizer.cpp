@@ -96,9 +96,20 @@ void	BarycentricRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader
 	}
 }
 
-		// clip_space[0].position = clip_space[0].position / clip_space[0].position.w;
-		// clip_space[1].position = clip_space[1].position / clip_space[1].position.w;
-		// clip_space[2].position = clip_space[2].position / clip_space[2].position.w;
+void	BarycentricRasterizer::drawPolygon(std::queue<Vertex> &polygon, Shader *shader) {
+	if (polygon.empty())
+		return ;
+	Vertex	root = toNDC(polygon.front());
+	polygon.pop();
+	Vertex	prev = toNDC(polygon.front());
+	polygon.pop();
+	while (!polygon.empty()) {
+		Vertex	curr = toNDC(polygon.front());
+		polygon.pop();
+		this->drawTriangle(root, prev, curr, shader);
+		prev = curr;
+	}
+}
 
 void	BarycentricRasterizer::draw(Mesh &mesh, int count, Shader *shader, Clipper *clipper) {
 	Vertex				clip_space[3];
@@ -108,17 +119,7 @@ void	BarycentricRasterizer::draw(Mesh &mesh, int count, Shader *shader, Clipper 
 		for (int j = 0; j < 3; j++)
 			shader->vertex(mesh[i + j], clip_space[j]);
 		clipper->clip(clipped, clip_space[0], clip_space[1], clip_space[2]);
-		if (clipped.empty())
-			continue;
-		Vertex	root = clipped.front();
-		clipped.pop();
-		Vertex	prev = clipped.front();
-		clipped.pop();
-		while (!clipped.empty()) {
-			this->drawTriangle(root, prev, clipped.front(), shader);
-			prev = clipped.front();
-			clipped.pop();
-		}
+		this->drawPolygon(clipped, shader);
 	}
 }
 

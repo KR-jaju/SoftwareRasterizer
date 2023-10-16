@@ -13,6 +13,7 @@ private:
 	float	*depth;
 	bool	depthTest(int x, int y, Vertex const &fragment);
 	void	drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *shader);
+	void	drawPolygon(std::queue<Vertex> &polygon, Shader *shader);
 public:
 	BarycentricRasterizer(int width, int height);
 	virtual	~BarycentricRasterizer();
