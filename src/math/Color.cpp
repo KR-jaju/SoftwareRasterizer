@@ -17,4 +17,42 @@ Color::operator	int() const {
 	return (a << 24 | r << 16 | g << 8 | b);
 }
 
+Color	Color::operator+(const Color &ref) const {
+	return Color(this->r + ref.r,
+				this->g + ref.g,
+				this->b + ref.b,
+				this->a + ref.a);
+}
+
+Color	Color::operator-(const Color &ref) const{
+	return Color(this->r - ref.r,
+				this->g - ref.g,
+				this->b - ref.b,
+				this->a - ref.a);
+}
+
+Color	Color::operator-() const {
+	return Color(-this->r, -this->g, -this->b, -this->a);
+}
+
+Color	Color::operator*(float f) const {
+	return Color(this->r * f,
+				this->g * f,
+				this->b * f,
+				this->a * f);
+}
+
+Color	Color::operator*(const Color &ref) const {
+	return Color(this->r * ref.r,
+				this->g * ref.g,
+				this->b * ref.b,
+				this->a * ref.a);
+}
+Color	Color::operator/(float f) const {
+	return Color(this->r / f,
+				this->g / f,
+				this->b / f,
+				this->a / f);
+}
+
 
