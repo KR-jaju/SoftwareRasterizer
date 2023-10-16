@@ -4,6 +4,7 @@ extern "C" {
 #include "rasterizer/BarycentricRasterizer.hpp"
 #include "rasterizer/StandardRasterizer.hpp"
 #include "rasterizer/DefaultShader.hpp"
+#include "rasterizer/WeilerAthertonClipper.hpp"
 #include "util/MatrixUtil.hpp"
 
 int	main(void) {
@@ -37,7 +38,8 @@ int	main(void) {
 	mesh.get(2).normal = Vector3(0.0, 0.0, 1.0);
 	// Rasterizer	*rasterizer = new StandardRasterizer(512, 512);
 	Rasterizer	*rasterizer = new BarycentricRasterizer(512, 512);
-	rasterizer->draw(mesh, 3, &shader);
+	Clipper		*clipper = new WeilerAthertonClipper();
+	rasterizer->draw(mesh, 3, &shader, clipper);
 	rasterizer->blit(data);
 	mlx_put_image_to_window(mlx, window, image, 0, 0);
 	mlx_loop(mlx);

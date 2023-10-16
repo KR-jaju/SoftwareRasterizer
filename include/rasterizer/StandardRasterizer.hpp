@@ -2,6 +2,7 @@
 #define STANDARDRASTERIZER_HPP
 
 #include "./Rasterizer.hpp"
+#include "Clipper.hpp"
 #include "Vertex.hpp"
 
 class StandardRasterizer : public Rasterizer
@@ -16,7 +17,7 @@ public:
 	StandardRasterizer(int width, int height);
 	virtual ~StandardRasterizer();
 	bool	depthTest(float d, int idx);
-	void	draw(Mesh &mesh, int count, Shader *shader);
+	void	draw(Mesh &mesh, int count, Shader *shader, Clipper *clipper);
 	void	blit(int *dst);
 };
 
