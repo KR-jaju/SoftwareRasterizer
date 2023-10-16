@@ -18,6 +18,12 @@ int max(int x1, int x2)
 }
 
 static
+inline float cross(Vector4 &a, Vector4 &b, Vector4 &c) 
+{
+	return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+}
+
+static
 inline Vector4	toScreenSpace(Vector4 a, int width, int height) 
 {
 	a.x = (a.x * 0.5f + 0.5f) * width + 0.5f;
@@ -25,7 +31,7 @@ inline Vector4	toScreenSpace(Vector4 a, int width, int height)
 	return (a);
 }
 
-void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c)
+void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *shader)
 {
 	for (int i = 0; i < this->height; i++)
 		for (int j = 0; j < this->width; j++)
@@ -39,10 +45,24 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c)
 
 	float tmpX = tmp_a.x;
 	float tmpX2 = tmpX;
+
+	float u, v, w, pu, pv, pw, pa, area;
+	area = cross(tmp_a, tmp_b, tmp_c);
 	for (int i = int(tmp_a.y); i <= int(tmp_b.y); i++)
 	{
 		for (int j = min(tmpX, tmpX2); j <= max(tmpX, tmpX2); j++)
-			color[j + this->width * i] = 0x0000FF00;
+		{	
+			Vector4 p(j, i, 0, 0);
+			u = cross(tmp_b, tmp_c, p) / area;
+			v = cross(tmp_c, tmp_a, p) / area;
+			w = 1 - u - v;
+			pu = u / a.position.w;
+			pv = v / b.position.w;
+			pw = w / c.position.w;
+			pa = pu + pv + pw;
+			Vertex fragment = Vertex::mix(a, b, c, pu / pa, pv / pa, pw / pa);
+			shader->fragment(fragment, color[j + this->width * i]);
+		}
 		tmpX += slope1;
 		tmpX2 += slope2;
 	}
@@ -53,7 +73,18 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c)
 	for (int i = int(tmp_c.y); i >= int(tmp_b.y); i--)
 	{
 		for (int j = min(tmpX, tmpX2); j <= max(tmpX, tmpX2); j++)
-			color[j + this->width * i] = 0X0000FF00;
+		{
+			Vector4 p(j, i, 0, 0);
+			u = cross(tmp_b, tmp_c, p) / area;
+			v = cross(tmp_c, tmp_a, p) / area;
+			w = 1 - u - v;
+			pu = u / a.position.w;
+			pv = v / b.position.w;
+			pw = w / c.position.w;
+			pa = pu + pv + pw;
+			Vertex fragment = Vertex::mix(a, b, c, pu / pa, pv / pa, pw / pa);
+			shader->fragment(fragment, color[j + this->width * i]);
+		}
 		tmpX -= slope1;
 		tmpX2 -= slope2;
 	}
@@ -73,13 +104,6 @@ StandardRasterizer::~StandardRasterizer()
 	delete[] this->depth;
 }
 
-
-// static
-// inline float crossWidth(Vector3 &a, Vector3 &b, Vector3 &c) 
-// {
-// 	return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
-// }
-
 static bool cmp(Vertex &v1, Vertex &v2)
 {
 	if (v1.position.y < v2.position.y)
@@ -97,7 +121,7 @@ void StandardRasterizer::draw(Mesh &mesh, int count, Shader *shader)
 		for (int j = i; j < i + 3; j++)
 			vec.push_back(mesh.get(j));
 		std::sort(vec.begin(), vec.end(), cmp);
-		this->drawTriangle(vec[0], vec[1], vec[2]);
+		this->drawTriangle(vec[0], vec[1], vec[2], shader);
 	}
 }
 

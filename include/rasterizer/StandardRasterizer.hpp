@@ -11,7 +11,7 @@ private:
 	int		height;
 	int		*color;
 	float	*depth;
-	void	drawTriangle(Vertex &a, Vertex &b, Vertex &c);
+	void	drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *shader);
 public:
 	StandardRasterizer(int width, int height);
 	virtual ~StandardRasterizer();

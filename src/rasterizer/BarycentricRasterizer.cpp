@@ -71,9 +71,9 @@ void	BarycentricRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader
 			float	v = cross(screen_c, screen_a, p) / area;
 			float	w = 1 - u - v;
 			if (0 <= u && u <= 1 && 0 <= v && v <= 1 && 0 <= w && w <= 1) {
-				float	pu = u / a.position.z;
-				float	pv = v / b.position.z;
-				float	pw = w / c.position.z;
+				float	pu = u / a.position.w;
+				float	pv = v / b.position.w;
+				float	pw = w / c.position.w;
 				float	pa = pu + pv + pw;
 				Vertex	fragment = Vertex::mix(a, b, c, pu / pa,  pv / pa, pw / pa);
 				shader->fragment(fragment, this->color[x + y * this->width]);
