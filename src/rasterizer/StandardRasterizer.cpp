@@ -56,7 +56,7 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 	float tmpX = tmp_a.x;
 	float tmpX2 = tmpX;
 
-	float u, v, w, pu, pv, pw, pa, area;
+	float u, v, w, area;
 	area = cross(tmp_a, tmp_b, tmp_c);
 	for (int i = int(tmp_a.y); i <= int(tmp_b.y); i++)
 	{
@@ -68,11 +68,7 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 			u = cross(tmp_b, tmp_c, p) / area;
 			v = cross(tmp_c, tmp_a, p) / area;
 			w = 1 - u - v;
-			pu = u / a.position.w;
-			pv = v / b.position.w;
-			pw = w / c.position.w;
-			pa = pu + pv + pw;
-			Vertex fragment = Vertex::mix(a, b, c, pu / pa, pv / pa, pw / pa);
+			Vertex fragment = Vertex::mix(a, b, c, u, v, w);
 			if (depthTest(fragment.position.z, j + this->width * i) == false) continue;
 			shader->fragment(fragment, color[j + this->width * i]);
 		}
@@ -93,11 +89,7 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 			u = cross(tmp_b, tmp_c, p) / area;
 			v = cross(tmp_c, tmp_a, p) / area;
 			w = 1 - u - v;
-			pu = u / a.position.w;
-			pv = v / b.position.w;
-			pw = w / c.position.w;
-			pa = pu + pv + pw;
-			Vertex fragment = Vertex::mix(a, b, c, pu / pa, pv / pa, pw / pa);
+			Vertex fragment = Vertex::mix(a, b, c, u, v, w);
 			if (depthTest(fragment.position.z, j + this->width * i) == false) continue;
 			shader->fragment(fragment, color[j + this->width * i]);
 		}
