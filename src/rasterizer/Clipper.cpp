@@ -9,8 +9,6 @@ bool	isInside(Vertex const &vertex, Vector4 const &axis) {
 	return (v <= w);
 }
 
-#include <stdio.h>
-
 static
 Vertex	boundary(Vertex const &a, Vertex const &b, Vector4 const &axis) {
 	float const	a0 = a.position * axis;
@@ -18,7 +16,6 @@ Vertex	boundary(Vertex const &a, Vertex const &b, Vector4 const &axis) {
 	float const diff_a = a0 - a.position.w;
 	float const diff_b = b0 - b.position.w;
 	float const	t = diff_a / (diff_a - diff_b);
-	printf("%f\n", t);
 
 	return Vertex::mix(a, b, t);
 }

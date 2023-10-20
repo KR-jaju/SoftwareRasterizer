@@ -9,14 +9,16 @@ extern "C" {
 int	main(void) {
 	void	*mlx;
 	void	*window;
+	void	*image;
+	int		tmp;
+	int		*data;
 
 	mlx = mlx_init();
 	if (mlx == (void *)0)
 		return (1);
 	window = mlx_new_window(mlx, 512, 512, const_cast<char *>("Raycaster"));
-	void	*image = mlx_new_image(mlx, 512, 512);
-	int		a;
-	int		*data = (int *)mlx_get_data_addr(image, &a, &a, &a);
+	image = mlx_new_image(mlx, 512, 512);
+	data = (int *)mlx_get_data_addr(image, &tmp, &tmp, &tmp);
 
 	Matrix4x4		view;
 	Matrix4x4		projection;
@@ -44,6 +46,5 @@ int	main(void) {
 	mlx_loop(mlx);
 	return (0);
 }
-
 
 
