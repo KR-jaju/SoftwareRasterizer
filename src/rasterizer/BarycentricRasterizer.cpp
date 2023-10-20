@@ -106,20 +106,22 @@ void	BarycentricRasterizer::drawPolygon(std::queue<Vertex> &polygon, Shader *sha
 	while (!polygon.empty()) {
 		Vertex	curr = toNDC(polygon.front());
 		polygon.pop();
-		this->drawTriangle(root, prev, curr, shader);
+		this->drawTriangle(root, curr, prev, shader);
 		prev = curr;
 	}
 }
 
 void	BarycentricRasterizer::draw(Mesh &mesh, int count, Shader *shader, Clipper *clipper) {
-	Vertex				clip_space[3];
-	std::queue<Vertex>	clipped;
+	std::queue<Vertex>	polygon;
+	Vertex				tmp;
 
 	for (int i = 0; i + 3 <= count; i += 3) {
-		for (int j = 0; j < 3; j++)
-			shader->vertex(mesh[i + j], clip_space[j]);
-		clipper->clip(clipped, clip_space[0], clip_space[1], clip_space[2]);
-		this->drawPolygon(clipped, shader);
+		for (int j = 0; j < 3; j++) {
+			shader->vertex(mesh[i + j], tmp);
+			polygon.push(tmp);
+		}
+		clipper->clip(polygon);
+		this->drawPolygon(polygon, shader);
 	}
 }
 

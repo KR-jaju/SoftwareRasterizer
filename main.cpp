@@ -23,7 +23,7 @@ int	main(void) {
 	Matrix4x4		projection;
 	DefaultShader	shader;
 
-	MatrixUtil::viewMatrix(view, Vector3(0, 0, 0), Vector3(0, 0, 1));
+	MatrixUtil::viewMatrix(view, Vector3(0, 0, -0.5), Vector3(0, 0, 1));
 	MatrixUtil::perspectiveMatrix(projection, 90, 1, 0.3, 1000.0);
 	shader.setViewMatrix(view);
 	shader.setProjectionMatrix(projection);
@@ -31,14 +31,14 @@ int	main(void) {
 	Mesh mesh(3);
 
 	mesh.get(0).position = Vector4(-1, 0, 1, 1);
-	mesh.get(1).position = Vector4(0, 1, 1, 1);
+	mesh.get(1).position = Vector4(0, 0.2, -0.4, 1);
 	mesh.get(2).position = Vector4(0.8, -0.5, 1, 1);
 	mesh.get(0).normal = Vector3(1.0, 0.0, 0.0);
 	mesh.get(1).normal = Vector3(0.0, 1.0, 0.0);
 	mesh.get(2).normal = Vector3(0.0, 0.0, 1.0);
 	// Rasterizer	*rasterizer = new StandardRasterizer(512, 512);
 	Rasterizer	*rasterizer = new BarycentricRasterizer(512, 512);
-	Clipper		*clipper = new WeilerAthertonClipper();
+	Clipper		*clipper = new Clipper();
 	rasterizer->draw(mesh, 3, &shader, clipper);
 	rasterizer->blit(data);
 	mlx_put_image_to_window(mlx, window, image, 0, 0);
