@@ -9,6 +9,7 @@ struct Vertex {
 	Vector4	position;
 	Vector3	normal;
 	static Vertex	mix(Vertex const &a, Vertex const &b, Vertex const &c, float ratio_a, float ratio_b, float ratio_c);
+	static Vertex	mix(Vertex const &a, Vertex const &b, float t);
 };
 
 #endif

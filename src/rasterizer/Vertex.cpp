@@ -16,3 +16,11 @@ Vertex	Vertex::mix(Vertex const &a, Vertex const &b, Vertex const &c, float u, f
 	ret.normal = a.normal * pu + b.normal * pv + c.normal * pw;
 	return (ret);
 }
+
+Vertex	Vertex::mix(Vertex const &a, Vertex const &b, float t) {
+	Vertex	ret;
+
+	ret.position = a.position * (1 - t) + b.position * t;
+	ret.normal = a.normal * (1 - t) + b.normal * t;
+	return (ret);
+}
