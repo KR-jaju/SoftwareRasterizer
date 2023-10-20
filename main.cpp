@@ -4,7 +4,6 @@ extern "C" {
 #include "rasterizer/BarycentricRasterizer.hpp"
 #include "rasterizer/StandardRasterizer.hpp"
 #include "rasterizer/DefaultShader.hpp"
-#include "rasterizer/WeilerAthertonClipper.hpp"
 #include "util/MatrixUtil.hpp"
 
 int	main(void) {
