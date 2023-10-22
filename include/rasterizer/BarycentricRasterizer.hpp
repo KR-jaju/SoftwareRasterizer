@@ -10,8 +10,6 @@ class BarycentricRasterizer : public Rasterizer {
 private:
 	int		width;
 	int		height;
-	int		*color;
-	float	*depth;
 	RenderTexture	*target;
 	bool	depthTest(int x, int y, Vertex const &fragment);
 	void	drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *shader);
