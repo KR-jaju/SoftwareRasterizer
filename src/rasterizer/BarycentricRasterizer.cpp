@@ -13,6 +13,7 @@ BarycentricRasterizer::BarycentricRasterizer(int width, int height) {
 	this->depth = new float[width * height];
 	for (int i = 0; i < width * height; i++)
 		this->depth[i] = 1;
+	this->target = 0;
 }
 
 BarycentricRasterizer::~BarycentricRasterizer() {
@@ -62,7 +63,8 @@ inline float	cross(Vector4 &a, Vector4 &b, Vector4 &c) {
 }
 
 bool	BarycentricRasterizer::depthTest(int x, int y, Vertex const &fragment) {
-	float	&storedDepth = this->depth[x + y * this->width];
+	float	&storedDepth = this->target->pixelDepth(x, y);
+	// this->depth[x + y * this->width];
 
 	if (storedDepth <= fragment.position.z)
 		return (false);
@@ -90,7 +92,7 @@ void	BarycentricRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader
 				Vertex	fragment = Vertex::mix(a, b, c, u, v, w);
 				if (!this->depthTest(x, y, fragment))
 					continue;
-				shader->fragment(fragment, this->color[x + y * this->width]);
+				shader->fragment(fragment, this->target->pixelColor(x, y));
 			}
 		}
 	}
@@ -115,6 +117,8 @@ void	BarycentricRasterizer::draw(Mesh &mesh, int count, Shader *shader, Clipper 
 	std::queue<Vertex>	polygon;
 	Vertex				tmp;
 
+	if (this->target == 0)
+		return ;
 	for (int i = 0; i + 3 <= count; i += 3) {
 		for (int j = 0; j < 3; j++) {
 			shader->vertex(mesh[i + j], tmp);
@@ -125,8 +129,15 @@ void	BarycentricRasterizer::draw(Mesh &mesh, int count, Shader *shader, Clipper 
 	}
 }
 
+void	BarycentricRasterizer::setTarget(RenderTexture *rt) {
+	this->target = rt;
+}
+
 void	BarycentricRasterizer::blit(int *dst) {
+	if (this->target == 0)
+		return ;
 	for (int y = 0; y < this->height; y++)
 		for (int x = 0; x < this->width; x++)
-			dst[x + y * this->width] = this->color[x + y * this->width];
+			dst[x + y * this->width] = (Color)this->target->pixelColor(x, y);
+			//this->color[x + y * this->width];
 }

@@ -13,7 +13,7 @@ public:
 	void	setViewMatrix(Matrix4x4 &m);
 	void	setProjectionMatrix(Matrix4x4 &m);
 	void	vertex(Vertex const &in, Vertex &out);
-	void	fragment(Vertex const &in, int &color);
+	void	fragment(Vertex const &in, Vector4 &color);
 };
 
 #endif
