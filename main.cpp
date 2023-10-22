@@ -53,14 +53,20 @@ int	main(void) {
 	shader.setViewMatrix(view);
 	shader.setProjectionMatrix(projection);
 
-	Mesh mesh(3);
+	Mesh mesh(6);
 
 	mesh.get(0).position = Vector4(-1, 0, 1, 1);
-	mesh.get(1).position = Vector4(0, 0.2, -0.3, 1);
-	mesh.get(2).position = Vector4(0.8, -0.5, 1, 1);
+	mesh.get(1).position = Vector4(0, -0.5, 0, 1);
+	mesh.get(2).position = Vector4(0, 0.5, 0, 1);
 	mesh.get(0).normal = Vector3(1.0, 0.0, 0.0);
 	mesh.get(1).normal = Vector3(0.0, 1.0, 0.0);
 	mesh.get(2).normal = Vector3(0.0, 0.0, 1.0);
+	mesh.get(3).position = Vector4(1, 0, 1, 1);
+	mesh.get(4).position = Vector4(0, 0.5, 0, 1);
+	mesh.get(5).position = Vector4(0, -0.5, 0, 1);
+	mesh.get(3).normal = Vector3(1.0, 0.0, 0.0);
+	mesh.get(4).normal = Vector3(0.0, 1.0, 0.0);
+	mesh.get(5).normal = Vector3(0.0, 0.0, 1.0);
 	Rasterizer	*rasterizer = new StandardRasterizer(512, 512);
 	RenderTexture	rt(512, 512);
 	rt.clear(Vector4(0, 0, 0, 0), 1.0f);
@@ -68,7 +74,7 @@ int	main(void) {
 	rasterizer->setTarget(&rt);
 	// Clipper		*clipper = new Clipper();
 	Clipper		*clipper = new CohenSutherandClipper();
-	rasterizer->draw(mesh, 3, &shader, clipper);
+	rasterizer->draw(mesh, 6, &shader, clipper);
 	rasterizer->blit(vars.data);
 	mlx_put_image_to_window(vars.mlx, vars.window, vars.image, 0, 0);
 	typedef int (*funct_ptr)();
