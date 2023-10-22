@@ -2,6 +2,7 @@
 #include "math/Vector3.hpp"
 #include <cmath>
 #include <vector>
+#include <iostream>
 
 int min(int x1, int x2)
 {
@@ -15,6 +16,13 @@ int max(int x1, int x2)
 	if (x1 > x2)
 		return x1;
 	return x2;
+}
+
+static bool cmp(Vertex &v1, Vertex &v2)
+{
+	if (v1.position.y < v2.position.y)
+		return false;
+	return true;
 }
 
 static
@@ -40,11 +48,26 @@ bool StandardRasterizer::depthTest(int y, int x, Vertex &fragment)
 	return true;
 }
 
+static
+int roundFloat(float x)
+{
+	float check = x - int(x);
+	if (check > 0.5)
+		return int(x) + 1;
+	return int(x);
+}
+
 void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *shader)
 {
-	Vector4 tmp_a = toScreenSpace(a.position, this->width, this->height);
-	Vector4 tmp_b = toScreenSpace(b.position, this->width, this->height);
-	Vector4 tmp_c = toScreenSpace(c.position, this->width, this->height);
+	std::vector<Vertex> vec;
+	vec.push_back(a);
+	vec.push_back(b);
+	vec.push_back(c);
+	sort(vec.begin(), vec.end(), cmp);
+
+	Vector4 tmp_a = toScreenSpace(vec[0].position, this->width, this->height);
+	Vector4 tmp_b = toScreenSpace(vec[1].position, this->width, this->height);
+	Vector4 tmp_c = toScreenSpace(vec[2].position, this->width, this->height);
 	float slope1 = (tmp_a.x - tmp_b.x) / (tmp_a.y - tmp_b.y);
 	float slope2 = (tmp_a.x - tmp_c.x) / (tmp_a.y - tmp_c.y);
 
@@ -53,12 +76,14 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 
 	float u, v, w, area;
 	area = cross(tmp_a, tmp_b, tmp_c);
-	for (int i = int(tmp_a.y); i <= int(tmp_b.y); i++)
+	for (int i = roundFloat(tmp_a.y); i <= roundFloat(tmp_b.y); i++)
 	{
 		if (i < 0 || i > height) continue;
-		for (int j = min(tmpX, tmpX2); j <= max(tmpX, tmpX2); j++)
+		tmpX = tmp_a.x + slope1 * (i + 0.5 - tmp_a.y);
+		tmpX2 = tmp_a.x + slope2 * (i + 0.5 - tmp_a.y);
+		for (int j = min(roundFloat(tmpX), roundFloat(tmpX2)); j <= max(roundFloat(tmpX), roundFloat(tmpX2)); j++)
 		{	
-			if (j < 0 || j > width) continue;
+			if (j < 0 || j >= width) continue;
 			Vector4 p(j, i, 0, 0);
 			u = cross(tmp_b, tmp_c, p) / area;
 			v = cross(tmp_c, tmp_a, p) / area;
@@ -67,19 +92,19 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 			if (depthTest(i, j, fragment) == false) continue;
 			shader->fragment(fragment, this->target->pixelColor(j, i));
 		}
-		tmpX += slope1;
-		tmpX2 += slope2;
 	}
 
 	slope1 = (tmp_c.x - tmp_b.x) / (tmp_c.y - tmp_b.y);
 	tmpX = tmp_c.x;
 	tmpX2 = tmpX;
-	for (int i = int(tmp_c.y); i >= int(tmp_b.y); i--)
+	for (int i = roundFloat(tmp_c.y); i >= roundFloat(tmp_b.y); i--)
 	{
 		if (i < 0 || i > height) continue;
-		for (int j = min(tmpX, tmpX2); j <= max(tmpX, tmpX2); j++)
+		tmpX = tmp_c.x + slope1 * (i + 0.5 - tmp_c.y);
+		tmpX2 = tmp_c.x + slope2 * (i + 0.5 - tmp_c.y);
+		for (int j = min(roundFloat(tmpX), roundFloat(tmpX2)); j <= max(roundFloat(tmpX), roundFloat(tmpX2)); j++)
 		{
-			if (j < 0 || j > width) continue;
+			if (j < 0 || j >= width) continue;
 			Vector4 p(j, i, 0, 0);
 			u = cross(tmp_b, tmp_c, p) / area;
 			v = cross(tmp_c, tmp_a, p) / area;
@@ -88,8 +113,6 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 			if (depthTest(i, j, fragment) == false) continue;
 			shader->fragment(fragment, this->target->pixelColor(j, i));
 		}
-		tmpX -= slope1;
-		tmpX2 -= slope2;
 	}
 }
 
@@ -107,13 +130,6 @@ void	StandardRasterizer::setTarget(RenderTexture *rt) {
 	this->target = rt;
 }
 
-static bool cmp(Vertex &v1, Vertex &v2)
-{
-	if (v1.position.y < v2.position.y)
-		return false;
-	return true;
-}
-
 static
 inline Vertex toNDC(Vertex clip_space)
 {
@@ -125,8 +141,6 @@ inline Vertex toNDC(Vertex clip_space)
 
 void StandardRasterizer::drawPolygon(std::queue<Vertex> &polygon, Shader *shader)
 {
-	std::vector<Vertex> vec;
-
 	Vertex root = toNDC(polygon.front());
 	polygon.pop();
 	Vertex prev = toNDC(polygon.front());
@@ -136,12 +150,8 @@ void StandardRasterizer::drawPolygon(std::queue<Vertex> &polygon, Shader *shader
 	{
 		curr = toNDC(polygon.front());
 		polygon.pop();
-		vec.clear();
-		vec.push_back(root);
-		vec.push_back(prev);
-		vec.push_back(curr);
-		std::sort(vec.begin(), vec.end(), cmp);
-		drawTriangle(vec[0], vec[1], vec[2], shader);
+		std::cout << toScreenSpace(root.position, width, height).x << ", " << toScreenSpace(prev.position, width, height).x << ", " << toScreenSpace(curr.position, width, height).x << std::endl;
+		drawTriangle(root, prev, curr, shader);
 		prev = curr;
 	}
 }

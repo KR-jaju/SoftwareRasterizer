@@ -10,8 +10,9 @@ void	DefaultShader::vertex(Vertex const &in, Vertex &out) {
 void	DefaultShader::fragment(Vertex const &in, Vector4 &color) {
 	// color = Vector4(0.0, 1.0, 1.0, 0.0);
 	// color = (Color)in.normal;
-	color = Vector4(in.normal, 0.0);
+	// color = Vector4(in.normal, 0.0);
 	// color = Vector4(1, 1, 1, 0) * in.position.z;
+	color = color + Vector4(0.3, 0.3, 0.3, 0);
 	(void)in;
 }
 
