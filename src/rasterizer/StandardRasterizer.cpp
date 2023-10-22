@@ -115,6 +115,9 @@ StandardRasterizer::~StandardRasterizer()
 	delete[] this->color;
 	delete[] this->depth;
 }
+void	StandardRasterizer::setTarget(RenderTexture *rt) {
+	(void) rt;
+}
 
 static bool cmp(Vertex &v1, Vertex &v2)
 {
