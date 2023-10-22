@@ -4,6 +4,7 @@ extern "C" {
 #include "rasterizer/BarycentricRasterizer.hpp"
 #include "rasterizer/StandardRasterizer.hpp"
 #include "rasterizer/DefaultShader.hpp"
+#include "rasterizer/CohenSutherlandClipper.hpp"
 #include "util/MatrixUtil.hpp"
 
 int	main(void) {
@@ -42,7 +43,8 @@ int	main(void) {
 	rt.clear(Vector4(0, 0, 0, 0), 1.0f);
 	Rasterizer	*rasterizer = new BarycentricRasterizer(512, 512);
 	rasterizer->setTarget(&rt);
-	Clipper		*clipper = new Clipper();
+	// Clipper		*clipper = new Clipper();
+	Clipper		*clipper = new CohenSutherandClipper();
 	rasterizer->draw(mesh, 3, &shader, clipper);
 	rasterizer->blit(data);
 	mlx_put_image_to_window(mlx, window, image, 0, 0);
