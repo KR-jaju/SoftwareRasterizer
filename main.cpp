@@ -6,20 +6,43 @@ extern "C" {
 #include "rasterizer/DefaultShader.hpp"
 #include "rasterizer/CohenSutherlandClipper.hpp"
 #include "util/MatrixUtil.hpp"
+#include <stdlib.h>
+#include <fcntl.h>
 
-int	main(void) {
+int	exit_hook(void)
+{
+	exit(0);
+}
+
+typedef struct vars
+{
 	void	*mlx;
 	void	*window;
 	void	*image;
 	int		tmp;
 	int		*data;
+}	t_vars;
 
-	mlx = mlx_init();
-	if (mlx == (void *)0)
+
+int	key_hook(int keycode, t_vars *vars)
+{
+	if (keycode == 53)
+	{
+		mlx_destroy_window(vars->mlx, vars->window);
+		exit(0);
+	}
+	return (0);
+}
+
+int	main(void) {
+	t_vars	vars;
+
+	vars.mlx = mlx_init();
+	if (vars.mlx == (void *)0)
 		return (1);
-	window = mlx_new_window(mlx, 512, 512, const_cast<char *>("Raycaster"));
-	image = mlx_new_image(mlx, 512, 512);
-	data = (int *)mlx_get_data_addr(image, &tmp, &tmp, &tmp);
+	vars.window = mlx_new_window(vars.mlx, 512, 512, const_cast<char *>("Raycaster"));
+	vars.image = mlx_new_image(vars.mlx, 512, 512);
+	vars.data = (int *)mlx_get_data_addr(vars.image, &(vars.tmp), &(vars.tmp), &(vars.tmp));
 
 	Matrix4x4		view;
 	Matrix4x4		projection;
@@ -38,17 +61,20 @@ int	main(void) {
 	mesh.get(0).normal = Vector3(1.0, 0.0, 0.0);
 	mesh.get(1).normal = Vector3(0.0, 1.0, 0.0);
 	mesh.get(2).normal = Vector3(0.0, 0.0, 1.0);
-	// Rasterizer	*rasterizer = new StandardRasterizer(512, 512);
+	Rasterizer	*rasterizer = new StandardRasterizer(512, 512);
 	RenderTexture	rt(512, 512);
 	rt.clear(Vector4(0, 0, 0, 0), 1.0f);
-	Rasterizer	*rasterizer = new BarycentricRasterizer(512, 512);
+	// Rasterizer	*rasterizer = new BarycentricRasterizer(512, 512);
 	rasterizer->setTarget(&rt);
 	// Clipper		*clipper = new Clipper();
 	Clipper		*clipper = new CohenSutherandClipper();
 	rasterizer->draw(mesh, 3, &shader, clipper);
-	rasterizer->blit(data);
-	mlx_put_image_to_window(mlx, window, image, 0, 0);
-	mlx_loop(mlx);
+	rasterizer->blit(vars.data);
+	mlx_put_image_to_window(vars.mlx, vars.window, vars.image, 0, 0);
+	typedef int (*funct_ptr)();
+	mlx_key_hook(vars.window, reinterpret_cast<funct_ptr>(key_hook), &vars);
+	mlx_hook(vars.window, 17, 0, exit_hook, 0);
+	mlx_loop(vars.mlx);
 	return (0);
 }
 
