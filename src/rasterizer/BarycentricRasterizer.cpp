@@ -9,10 +9,10 @@
 BarycentricRasterizer::BarycentricRasterizer(int width, int height) {
 	this->width = width;
 	this->height = height;
-	this->color = new int[width * height];
-	this->depth = new float[width * height];
-	for (int i = 0; i < width * height; i++)
-		this->depth[i] = 1;
+	// this->color = new int[width * height];
+	// this->depth = new float[width * height];
+	// for (int i = 0; i < width * height; i++)
+	// 	this->depth[i] = 1;
 	this->target = 0;
 }
 

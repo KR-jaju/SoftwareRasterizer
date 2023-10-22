@@ -31,22 +31,17 @@ inline Vector4	toScreenSpace(Vector4 a, int width, int height)
 	return (a);
 }
 
-bool StandardRasterizer::depthTest(float d, int idx)
+bool StandardRasterizer::depthTest(int y, int x, Vertex &fragment)
 {
-	if (depth[idx] > d)
-	{
-		depth[idx] = d;
-		return true;
-	}
-	return false;
+	float &storedDepth = target->pixelDepth(x, y);
+	if (storedDepth <= fragment.position.z)
+		return false;
+	storedDepth = fragment.position.z;
+	return true;
 }
 
 void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *shader)
 {
-	for (int i = 0; i < this->height; i++)
-		for (int j = 0; j < this->width; j++)
-			this->color[j + i * this->width] = 0x00000000;
-	
 	Vector4 tmp_a = toScreenSpace(a.position, this->width, this->height);
 	Vector4 tmp_b = toScreenSpace(b.position, this->width, this->height);
 	Vector4 tmp_c = toScreenSpace(c.position, this->width, this->height);
@@ -69,9 +64,8 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 			v = cross(tmp_c, tmp_a, p) / area;
 			w = 1 - u - v;
 			Vertex fragment = Vertex::mix(a, b, c, u, v, w);
-			if (depthTest(fragment.position.z, j + this->width * i) == false) continue;
+			if (depthTest(i, j, fragment) == false) continue;
 			shader->fragment(fragment, this->target->pixelColor(j, i));
-			//color[j + this->width * i]);
 		}
 		tmpX += slope1;
 		tmpX2 += slope2;
@@ -91,9 +85,8 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 			v = cross(tmp_c, tmp_a, p) / area;
 			w = 1 - u - v;
 			Vertex fragment = Vertex::mix(a, b, c, u, v, w);
-			if (depthTest(fragment.position.z, j + this->width * i) == false) continue;
+			if (depthTest(i, j, fragment) == false) continue;
 			shader->fragment(fragment, this->target->pixelColor(j, i));
-			//shader->fragment(fragment, color[j + this->width * i]);
 		}
 		tmpX -= slope1;
 		tmpX2 -= slope2;
@@ -104,19 +97,14 @@ StandardRasterizer::StandardRasterizer(int width, int height)
 {
 	this->width = width;
 	this->height = height;
-	this->color = new int[width * height];
-	this->depth = new float[width * height];
-	for (int i = 0; i < width * height; i++)
-		depth[i] = 1;
+	this->target = 0;
 }
 
 StandardRasterizer::~StandardRasterizer()
 {
-	delete[] this->color;
-	delete[] this->depth;
 }
 void	StandardRasterizer::setTarget(RenderTexture *rt) {
-	(void) rt;
+	this->target = rt;
 }
 
 static bool cmp(Vertex &v1, Vertex &v2)
@@ -126,24 +114,62 @@ static bool cmp(Vertex &v1, Vertex &v2)
 	return true;
 }
 
+static
+inline Vertex toNDC(Vertex clip_space)
+{
+	clip_space.position.x /= clip_space.position.w;
+	clip_space.position.y /= clip_space.position.w;
+	clip_space.position.z /= clip_space.position.w;
+	return clip_space;
+}
+
+void StandardRasterizer::drawPolygon(std::queue<Vertex> &polygon, Shader *shader)
+{
+	std::vector<Vertex> vec;
+
+	Vertex root = toNDC(polygon.front());
+	polygon.pop();
+	Vertex prev = toNDC(polygon.front());
+	polygon.pop();
+	Vertex curr;
+	while(polygon.size())
+	{
+		curr = toNDC(polygon.front());
+		polygon.pop();
+		vec.clear();
+		vec.push_back(root);
+		vec.push_back(prev);
+		vec.push_back(curr);
+		std::sort(vec.begin(), vec.end(), cmp);
+		drawTriangle(vec[0], vec[1], vec[2], shader);
+		prev = curr;
+	}
+}
+
 void StandardRasterizer::draw(Mesh &mesh, int count, Shader *shader, Clipper *clipper)
 {
-	(void) shader;
-	(void) clipper;
-	std::vector<Vertex> vec;
+	std::queue<Vertex> polygon;
+	Vertex tmp;
+
+	if (this->target == 0)
+		return ;
 	for (int i = 0; i + 3 <= count; i += 3)
 	{
-		vec.clear();
 		for (int j = i; j < i + 3; j++)
-			vec.push_back(mesh.get(j));
-		std::sort(vec.begin(), vec.end(), cmp);
-		this->drawTriangle(vec[0], vec[1], vec[2], shader);
+		{
+			shader->vertex(mesh[i + j], tmp);
+			polygon.push(tmp);
+		}
+		clipper->clip(polygon);
+		drawPolygon(polygon, shader);
 	}
 }
 
 void StandardRasterizer::blit(int *dst)
 {
+	if (this->target == 0)
+		return ;
 	for (int y = 0; y < this->height; y++)
 		for (int x = 0; x < this->width; x++)
-			dst[x + y * this->width] = this->color[x + y * this->width];
+			dst[x + y * this->width] = (Color)this->target->pixelColor(x, y);
 }
