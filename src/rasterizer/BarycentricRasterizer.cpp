@@ -9,17 +9,10 @@
 BarycentricRasterizer::BarycentricRasterizer(int width, int height) {
 	this->width = width;
 	this->height = height;
-	this->color = new int[width * height];
-	this->depth = new float[width * height];
-	for (int i = 0; i < width * height; i++)
-		this->depth[i] = 1;
 	this->target = 0;
 }
 
-BarycentricRasterizer::~BarycentricRasterizer() {
-	delete[] this->color;
-	delete[] this->depth;
-}
+BarycentricRasterizer::~BarycentricRasterizer() {}
 
 static
 float	min(float a, float b, float c) {
@@ -64,7 +57,6 @@ inline float	cross(Vector4 &a, Vector4 &b, Vector4 &c) {
 
 bool	BarycentricRasterizer::depthTest(int x, int y, Vertex const &fragment) {
 	float	&storedDepth = this->target->pixelDepth(x, y);
-	// this->depth[x + y * this->width];
 
 	if (storedDepth <= fragment.position.z)
 		return (false);
@@ -139,5 +131,4 @@ void	BarycentricRasterizer::blit(int *dst) {
 	for (int y = 0; y < this->height; y++)
 		for (int x = 0; x < this->width; x++)
 			dst[x + y * this->width] = (Color)this->target->pixelColor(x, y);
-			//this->color[x + y * this->width];
 }
