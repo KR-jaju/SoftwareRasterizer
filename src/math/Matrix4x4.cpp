@@ -24,7 +24,7 @@ Matrix4x4	Matrix4x4::operator*(Matrix4x4 const &m) {
 		for (int j = 0; j < 4; j++) {
 			ret.m[i][j] = 0;
 			for (int k = 0; k < 4; k++) {
-				ret.m[i][j] += this->m[i][j + k] * m.m[i + k][j];
+				ret.m[i][j] += this->m[i][k] * m.m[k][j];
 			}
 		}
 	}

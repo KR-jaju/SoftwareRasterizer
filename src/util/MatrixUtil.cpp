@@ -30,7 +30,8 @@ void	MatrixUtil::viewMatrix(Matrix4x4 &ref, Vector3 const &pos, Vector3 const &d
 // }
 
 void	MatrixUtil::perspectiveMatrix(Matrix4x4 &ref, float fov, float aspect, float near, float far) {
-	float	t = 1 / tanf(fov / 360 * M_PI);
+	float const	t = 1 / tanf(fov / 360 * M_PI);
+
 	ref.m[0][0] = t;
 	ref.m[0][1] = 0;
 	ref.m[0][2] = 0;
