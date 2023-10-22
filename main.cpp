@@ -56,7 +56,7 @@ int	main(void) {
 	Mesh mesh(3);
 
 	mesh.get(0).position = Vector4(-1, 0, 1, 1);
-	mesh.get(1).position = Vector4(0, 0.2, -0.4, 1);
+	mesh.get(1).position = Vector4(0, 0.2, -0.3, 1);
 	mesh.get(2).position = Vector4(0.8, -0.5, 1, 1);
 	mesh.get(0).normal = Vector3(1.0, 0.0, 0.0);
 	mesh.get(1).normal = Vector3(0.0, 1.0, 0.0);
