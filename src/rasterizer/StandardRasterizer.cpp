@@ -70,7 +70,8 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 			w = 1 - u - v;
 			Vertex fragment = Vertex::mix(a, b, c, u, v, w);
 			if (depthTest(fragment.position.z, j + this->width * i) == false) continue;
-			shader->fragment(fragment, color[j + this->width * i]);
+			shader->fragment(fragment, this->target->pixelColor(j, i));
+			//color[j + this->width * i]);
 		}
 		tmpX += slope1;
 		tmpX2 += slope2;
@@ -91,7 +92,8 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 			w = 1 - u - v;
 			Vertex fragment = Vertex::mix(a, b, c, u, v, w);
 			if (depthTest(fragment.position.z, j + this->width * i) == false) continue;
-			shader->fragment(fragment, color[j + this->width * i]);
+			shader->fragment(fragment, this->target->pixelColor(j, i));
+			//shader->fragment(fragment, color[j + this->width * i]);
 		}
 		tmpX -= slope1;
 		tmpX2 -= slope2;

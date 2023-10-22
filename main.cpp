@@ -38,7 +38,10 @@ int	main(void) {
 	mesh.get(1).normal = Vector3(0.0, 1.0, 0.0);
 	mesh.get(2).normal = Vector3(0.0, 0.0, 1.0);
 	// Rasterizer	*rasterizer = new StandardRasterizer(512, 512);
+	RenderTexture	rt(512, 512);
+	rt.clear(Vector4(0, 0, 0, 0), 1.0f);
 	Rasterizer	*rasterizer = new BarycentricRasterizer(512, 512);
+	rasterizer->setTarget(&rt);
 	Clipper		*clipper = new Clipper();
 	rasterizer->draw(mesh, 3, &shader, clipper);
 	rasterizer->blit(data);

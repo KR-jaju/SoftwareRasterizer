@@ -16,6 +16,13 @@ Vector4::Vector4(float x, float y, float z, float w) {
 	this->w = w;
 }
 
+Vector4::Vector4(Vector3 const &v, float w) {
+	this->x = v.x;
+	this->y = v.y;
+	this->z = v.z;
+	this->w = w;
+}
+
 Vector4::Vector4(const Vector4 &ref) {
 	this->x = ref.x;
 	this->y = ref.y;
@@ -83,6 +90,10 @@ Vector4	Vector4::operator/(float f) const {
 	ret.z = this->z / f;
 	ret.w = this->w / f;
 	return (ret);
+}
+
+Vector4::operator	Color() const {
+	return (Color(this->x, this->y, this->z, this->w));
 }
 
 float	Vector4::lengthSqr() const {
