@@ -13,3 +13,7 @@ Vertex	&Mesh::get(int idx) {
 Vertex	&Mesh::operator[](int idx){
 	return (this->vertices[idx]);	
 }
+
+int Mesh::getSize() {
+	return this->size;
+}

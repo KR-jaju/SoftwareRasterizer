@@ -174,14 +174,13 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 	area = cross(tmp_a, tmp_b, tmp_c);
 	upTrianglePixelsLeft = Brasenham(tmp_a, tmp_b);
 	upTrianglePixelsRight = Brasenham(tmp_a, tmp_d);
-	std::cout << "1. tmp_a: {" << tmp_a.x << ", " << tmp_a.y << "}\n";
-	std::cout << "1. tmp_b: {" << tmp_b.x << ", " << tmp_b.y << "}\n";
-	std::cout << "1. tmp_d: {" << tmp_d.x << ", " << tmp_d.y << "}\n";
 	if (tmp_a.x != tmp_d.x || tmp_a.y != tmp_d.y)
 	{
 		for (int i = 0; i < int(upTrianglePixelsLeft.size()); i++)
 		{
 			int start, end;
+			if (i == int(upTrianglePixelsRight.size()))
+				break;
 			if (upTrianglePixelsLeft[i].x <= upTrianglePixelsRight[i].x)
 			{
 				start = upTrianglePixelsLeft[i].x;
@@ -205,16 +204,16 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 		}
 	}
 	if (tmp_d.x == tmp_c.x)
+	{
 		return;
-	std::cout << "2. tmp_c: {" << tmp_c.x << ", " << tmp_c.y << "}\n";
-	std::cout << "2. tmp_b: {" << tmp_b.x << ", " << tmp_b.y << "}\n";
-	std::cout << "2. tmp_d: {" << tmp_d.x << ", " << tmp_d.y << "}\n";
+	}
 	downTrianglePixelsLeft = Brasenham(tmp_c, tmp_b);
 	downTrianglePixelsRight = Brasenham(tmp_c, tmp_d);
-	std::cout << downTrianglePixelsLeft.size() << ' ' << downTrianglePixelsRight.size() << std::endl;
 	for (int i = 0; i < int(downTrianglePixelsLeft.size()); i++)
 	{
 		int start, end;
+		if (i == int(downTrianglePixelsRight.size()))
+			break;
 		if (downTrianglePixelsLeft[i].x <= downTrianglePixelsRight[i].x)
 		{
 			start = downTrianglePixelsLeft[i].x;
@@ -254,10 +253,6 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 // 	float u, v, w, area;
 
 // 	area = cross(tmp_a, tmp_b, tmp_c);
-// 	// std::cout << "1. tmp_a: {" << tmp_a.x << ", " << tmp_a.y << "}\n";
-// 	// std::cout << "1. tmp_b: {" << tmp_b.x << ", " << tmp_b.y << "}\n";
-// 	// std::cout << "1. tmp_c: {" << tmp_c.x << ", " << tmp_c.y << "}\n";
-// 	// std::cout << "upLeftSize: " << upTrianglePixelsLeft.size() << ", upRightSize: " << upTrianglePixelsRight.size() << ", downLeftSize: " << downTrianglePixelsLeft.size() << std::endl;
 // 	upTrianglePixelsLeft = Brasenham(tmp_a, tmp_b);
 // 	upTrianglePixelsRight = Brasenham(tmp_a, tmp_c);
 // 	downTrianglePixelsLeft = Brasenham(tmp_b, tmp_c);
@@ -290,7 +285,6 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 // 				end = downTrianglePixelsLeft[i - int(upTrianglePixelsLeft.size())].x;
 // 			}
 // 		}
-// 		std::cout << start << ' ' << end << std::endl;
 // 		for (int j = start + 1; j <= end; j++)
 // 		{
 // 			Vector4 p(j, upTrianglePixelsRight[i].y, 0, 0);
@@ -345,7 +339,6 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 // 	}
 
 // 	slope1 = (tmp_c.x - tmp_b.x) / (tmp_c.y - tmp_b.y);
-// 	// std::cout << "slope3: " << slope1 << std::endl;
 // 	tmpX = tmp_c.x;
 // 	tmpX2 = tmpX;
 // 	if (tmp_c.y == tmp_b.y)
@@ -415,7 +408,8 @@ void StandardRasterizer::draw(Mesh &mesh, int count, Shader *shader, Clipper *cl
 {
 	std::queue<Vertex> polygon;
 	Vertex tmp;
-
+	float cnt = 0;
+	float percent = 1;
 	if (this->target == 0)
 		return ;
 	for (int i = 0; i + 3 <= count; i += 3)
@@ -427,6 +421,12 @@ void StandardRasterizer::draw(Mesh &mesh, int count, Shader *shader, Clipper *cl
 		}
 		clipper->clip(polygon);
 		drawPolygon(polygon, shader);
+		cnt++;
+		if (cnt >= (mesh.getSize() / 3.0) * (percent / 10.0))
+		{
+			std::cout << percent * 10 << "\% complete......" << std::endl;
+			percent++;
+		}
 	}
 }
 
