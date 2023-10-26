@@ -50,7 +50,8 @@ int	main(void) {
 	Matrix4x4		projection;
 	DefaultShader	shader;
 
-	MatrixUtil::viewMatrix(view, Vector3(0, 150, -150), Vector3(0, -1, 1));
+	MatrixUtil::viewMatrix(view, Vector3(0, 200, -10), Vector3(0, -200, 10));
+	// MatrixUtil::viewMatrix(view, Vector3(0, 0, -1), Vector3(0, 0, 1));
 	MatrixUtil::perspectiveMatrix(projection, 90, 1, 0.3, 1000.0);
 	shader.setViewMatrix(view);
 	shader.setProjectionMatrix(projection);
@@ -83,7 +84,7 @@ int	main(void) {
 			idx++;	
 		}
 	}
-
+	std::cout << "start rasterizer....\n";
 	Rasterizer	*rasterizer = new StandardRasterizer(512, 512);
 	RenderTexture	rt(512, 512);
 	rt.clear(Vector4(0, 0, 0, 0), 1.0f);

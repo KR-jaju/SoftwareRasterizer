@@ -5,6 +5,7 @@
 #include "rasterizer/Shader.hpp"
 #include <cmath>
 #include <algorithm>
+#include <iostream>
 
 BarycentricRasterizer::BarycentricRasterizer(int width, int height) {
 	this->width = width;
