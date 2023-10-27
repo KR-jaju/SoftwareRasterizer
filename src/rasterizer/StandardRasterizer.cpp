@@ -25,6 +25,10 @@ bool cmp(Vertex &v1, Vertex &v2)
 {
 	if (v1.position.y < v2.position.y)
 		return false;
+	if (v1.position.y == v2.position.y)
+	{
+		return v1.position.x < v2.position.x;
+	}
 	return true;
 }
 
@@ -260,6 +264,9 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 	Vector4 tmp_a = toScreenSpace(vec[0].position, this->width, this->height);
 	Vector4 tmp_b = toScreenSpace(vec[1].position, this->width, this->height);
 	Vector4 tmp_c = toScreenSpace(vec[2].position, this->width, this->height);
+	// std::cout << "tmp_a: " << tmp_a.x << ' ' << tmp_a.y << std::endl;
+	// std::cout << "tmp_b: " << tmp_b.x << ' ' << tmp_b.y << std::endl;
+	// std::cout << "tmp_c: " << tmp_c.x << ' ' << tmp_c.y << std::endl << std::endl;
 	float slope1 = (tmp_a.x - tmp_b.x) / (tmp_a.y - tmp_b.y);
 	float slope2 = (tmp_a.x - tmp_c.x) / (tmp_a.y - tmp_c.y);
 
@@ -270,9 +277,9 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 	area = cross(tmp_a, tmp_b, tmp_c);
 	if (tmp_a.y != tmp_b.y)
 	{
-		for (int i = roundFloat(tmp_a.y); i <= roundFloat(tmp_b.y); i++)
+		for (int i = roundFloat(tmp_a.y); i < roundFloat(tmp_b.y); i++)
 		{
-			for (int j = min(roundFloat(tmpX), roundFloat(tmpX2)); j <= max(roundFloat(tmpX), roundFloat(tmpX2)); j++)
+			for (int j = min(roundFloat(tmpX), roundFloat(tmpX2)); j < max(roundFloat(tmpX), roundFloat(tmpX2)); j++)
 			{	
 				Vector4 p(j, i, 0, 1);
 				u = cross(tmp_b, tmp_c, p) / area;
@@ -294,7 +301,7 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 		return;
 	for (int i = roundFloat(tmp_c.y); i >= roundFloat(tmp_b.y); i--)
 	{
-		for (int j = min(roundFloat(tmpX), roundFloat(tmpX2)); j <= max(roundFloat(tmpX), roundFloat(tmpX2)); j++)
+		for (int j = min(roundFloat(tmpX), roundFloat(tmpX2)); j < max(roundFloat(tmpX), roundFloat(tmpX2)); j++)
 		{
 			Vector4 p(j, i, 0, 1);
 			u = cross(tmp_b, tmp_c, p) / area;

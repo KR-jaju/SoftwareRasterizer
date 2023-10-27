@@ -25,9 +25,29 @@ void	MatrixUtil::viewMatrix(Matrix4x4 &ref, Vector3 const &pos, Vector3 const &d
 	ref.m[3][3] = 1;
 }
 
-// void	MatrixUtil::modelMatrix(Matrix4x4 &m, Vector3 ) {
-	
-// }
+void	MatrixUtil::tmpModelMatrix(Matrix4x4 &m, float degree)
+{
+	float radi = degree * M_PI / 180.0;
+	m.m[0][0] = cosf(radi);
+	m.m[0][1] = -sinf(radi);
+	m.m[0][2] = 0;
+	m.m[0][3] = 0;
+
+	m.m[1][0] = sinf(radi);
+	m.m[1][1] = cosf(radi);
+	m.m[1][2] = 0;
+	m.m[1][3] = 0;
+
+	m.m[2][0] = 0;
+	m.m[2][1] = 0;
+	m.m[2][2] = 1;
+	m.m[2][3] = 0;
+
+	m.m[3][0] = 0;
+	m.m[3][1] = 0;
+	m.m[3][2] = 0;
+	m.m[3][3] = 1;
+}
 
 void	MatrixUtil::perspectiveMatrix(Matrix4x4 &ref, float fov, float aspect, float near, float far) {
 	float const	t = 1 / tanf(fov / 360 * M_PI);
