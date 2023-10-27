@@ -10,6 +10,7 @@ extern "C" {
 #include <stdlib.h>
 #include <fcntl.h>
 #include <iostream>
+#include "util/QuaternionUtil.hpp"
 
 int	exit_hook(void)
 {
@@ -45,6 +46,13 @@ int	main(void) {
 	vars.window = mlx_new_window(vars.mlx, 512, 512, const_cast<char *>("Raycaster"));
 	vars.image = mlx_new_image(vars.mlx, 512, 512);
 	vars.data = (int *)mlx_get_data_addr(vars.image, &(vars.tmp), &(vars.tmp), &(vars.tmp));
+
+	Quaternion test = QuaternionUtil::rotation(Vector3(0, 1, 0), 22.5f);
+	Vector3	forward(0, 0, 1);
+	Vector3 rotated = test * forward * ~test;
+	std::cout << rotated.x << ","<< rotated.y << "," << rotated.z << std::endl;
+
+
 
 	Matrix4x4		view;
 	Matrix4x4		projection;
