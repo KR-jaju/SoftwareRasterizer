@@ -2,3 +2,4 @@
 *.o
 /rasterizer
 libmlx.a
+Dragon_2.obj
