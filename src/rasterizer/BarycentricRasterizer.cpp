@@ -10,7 +10,7 @@
 BarycentricRasterizer::BarycentricRasterizer(int width, int height) {
 	this->width = width;
 	this->height = height;
-	this->target = 0;
+	this->target = nullptr;
 }
 
 BarycentricRasterizer::~BarycentricRasterizer() {}
@@ -111,7 +111,7 @@ void	BarycentricRasterizer::draw(Mesh &mesh, int count, Shader *shader, Clipper 
 	std::queue<Vertex>	polygon;
 	Vertex				tmp;
 
-	if (this->target == 0)
+	if (this->target == nullptr)
 		return ;
 	for (int i = 0; i + 3 <= count; i += 3) {
 		for (int j = 0; j < 3; j++) {
@@ -128,7 +128,7 @@ void	BarycentricRasterizer::setTarget(RenderTexture *rt) {
 }
 
 void	BarycentricRasterizer::blit(int *dst) {
-	if (this->target == 0)
+	if (this->target == nullptr)
 		return ;
 	for (int y = 0; y < this->height; y++)
 		for (int x = 0; x < this->width; x++)
