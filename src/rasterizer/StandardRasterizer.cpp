@@ -55,14 +55,14 @@ bool StandardRasterizer::depthTest(int y, int x, Vertex &fragment)
 	return true;
 }
 
-static
-int roundFloat(float x)
-{
-	float check = x - int(x);
-	if (check > 0.5)
-		return int(x) + 1;
-	return int(x);
-}
+// static
+// int roundFloat(float x)
+// {
+// 	float check = x - int(x);
+// 	if (check > 0.5)
+// 		return int(x) + 1;
+// 	return int(x);
+// }
 
 // static
 // std::vector<Vector4> Brasenham(Vector4 p1, Vector4 p2)
@@ -252,6 +252,15 @@ int roundFloat(float x)
 // 	}
 // }
 
+static
+int	roundUpInt(float a) {
+	return int(roundf(a));
+}
+
+static
+int	roundDownInt(float a) {
+	return int(1 - roundf(1 - a));
+}
 
 void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *shader)
 {
@@ -275,12 +284,18 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 
 	float u, v, w, area;
 	area = cross(tmp_a, tmp_b, tmp_c);
-	if (tmp_a.y != tmp_b.y)
+
+	if (tmp_a.x != tmp_b.y)
 	{
-		for (int i = roundFloat(tmp_a.y); i < roundFloat(tmp_b.y); i++)
+		for (int i = roundDownInt(tmp_a.y); i < roundDownInt(tmp_b.y); i++)
 		{
-			for (int j = min(roundFloat(tmpX), roundFloat(tmpX2)); j < max(roundFloat(tmpX), roundFloat(tmpX2)); j++)
-			{	
+			int	from, to;
+			tmpX = tmp_a.x + slope1 * (i + 0.5 - tmp_a.y);
+			tmpX2 = tmp_a.x + slope2 * (i + 0.5 - tmp_a.y);
+			from = min(roundDownInt(tmpX), roundDownInt(tmpX2));
+			to = max(roundDownInt(tmpX), roundDownInt(tmpX2));
+			for (int j = from; j < to; j++)
+			{
 				Vector4 p(j, i, 0, 1);
 				u = cross(tmp_b, tmp_c, p) / area;
 				v = cross(tmp_c, tmp_a, p) / area;
@@ -289,8 +304,6 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 				if (depthTest(i, j, fragment) == false) continue;
 				shader->fragment(fragment, this->target->pixelColor(j, i));
 			}
-			tmpX = tmp_a.x + slope1 * (i + 0.5 - tmp_a.y);
-			tmpX2 = tmp_a.x + slope2 * (i + 0.5 - tmp_a.y);
 		}
 	}
 
@@ -298,10 +311,15 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 	tmpX = tmp_c.x;
 	tmpX2 = tmpX;
 	if (tmp_c.y == tmp_b.y)
-		return;
-	for (int i = roundFloat(tmp_c.y); i >= roundFloat(tmp_b.y); i--)
+		return ;
+	for (int i = roundUpInt(tmp_c.y) - 1; i >= roundDownInt(tmp_b.y); i--)
 	{
-		for (int j = min(roundFloat(tmpX), roundFloat(tmpX2)); j < max(roundFloat(tmpX), roundFloat(tmpX2)); j++)
+		int	from, to;
+		tmpX = tmp_c.x + slope1 * (i + 0.5 - tmp_c.y);
+		tmpX2 = tmp_c.x + slope2 * (i + 0.5 - tmp_c.y);
+		from = min(roundDownInt(tmpX), roundDownInt(tmpX2));
+		to = max(roundDownInt(tmpX), roundDownInt(tmpX2));
+		for (int j = from; j < to; j++)
 		{
 			Vector4 p(j, i, 0, 1);
 			u = cross(tmp_b, tmp_c, p) / area;
@@ -311,8 +329,6 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 			if (depthTest(i, j, fragment) == false) continue;
 			shader->fragment(fragment, this->target->pixelColor(j, i));
 		}
-		tmpX = tmp_c.x + slope1 * (i - tmp_c.y);
-		tmpX2 = tmp_c.x + slope2 * (i - tmp_c.y);
 	}
 }
 
