@@ -41,8 +41,8 @@ inline float cross(Vector4 &a, Vector4 &b, Vector4 &c)
 static
 inline Vector4	toScreenSpace(Vector4 a, int width, int height) 
 {
-	a.x = (a.x * 0.5f + 0.5f) * width + 0.5f;
-	a.y = (-a.y * 0.5f + 0.5f) * height + 0.5f;
+	a.x = (a.x * 0.5f + 0.5f) * width;
+	a.y = (-a.y * 0.5f + 0.5f) * height;
 	return (a);
 }
 
@@ -85,22 +85,23 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 	float u, v, w, area;
 	area = cross(tmp_a, tmp_b, tmp_c);
 
-	if (tmp_a.x != tmp_b.y)
+	if (tmp_a.y != tmp_b.y)
 	{
 		for (int i = roundDownInt(tmp_a.y); i < roundDownInt(tmp_b.y); i++)
 		{
 			int	from, to;
 			tmpX = tmp_a.x + slope1 * (i + 0.5 - tmp_a.y);
 			tmpX2 = tmp_a.x + slope2 * (i + 0.5 - tmp_a.y);
+
 			from = min(roundDownInt(tmpX), roundDownInt(tmpX2));
 			to = max(roundDownInt(tmpX), roundDownInt(tmpX2));
 			for (int j = from; j < to; j++)
 			{
-				Vector4 p(j, i, 0, 1);
+				Vector4 p(j + 0.5, i + 0.5, 0, 1);
 				u = cross(tmp_b, tmp_c, p) / area;
 				v = cross(tmp_c, tmp_a, p) / area;
 				w = 1 - u - v;
-				Vertex fragment = Vertex::mix(a, b, c, u, v, w);
+				Vertex fragment = Vertex::mix(vec[0], vec[1], vec[2], u, v, w);
 				if (depthTest(i, j, fragment) == false) continue;
 				shader->fragment(fragment, this->target->pixelColor(j, i));
 			}
@@ -108,8 +109,6 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 	}
 
 	slope1 = (tmp_c.x - tmp_b.x) / (tmp_c.y - tmp_b.y);
-	tmpX = tmp_c.x;
-	tmpX2 = tmpX;
 	if (tmp_c.y == tmp_b.y)
 		return ;
 	for (int i = roundUpInt(tmp_c.y) - 1; i >= roundDownInt(tmp_b.y); i--)
@@ -121,11 +120,13 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 		to = max(roundDownInt(tmpX), roundDownInt(tmpX2));
 		for (int j = from; j < to; j++)
 		{
-			Vector4 p(j, i, 0, 1);
+			Vector4	p(j + 0.5, i + 0.5, 0, 1);
 			u = cross(tmp_b, tmp_c, p) / area;
 			v = cross(tmp_c, tmp_a, p) / area;
 			w = 1 - u - v;
-			Vertex fragment = Vertex::mix(a, b, c, u, v, w);
+			if (!(0 <= u && u <= 1 && 0 <= v && v <= 1 && 0 <= w && w <= 1))
+				continue;
+			Vertex	fragment = Vertex::mix(vec[0], vec[1], vec[2], u, v, w);
 			if (depthTest(i, j, fragment) == false) continue;
 			shader->fragment(fragment, this->target->pixelColor(j, i));
 		}
