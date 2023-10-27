@@ -152,6 +152,7 @@ inline Vertex toNDC(Vertex clip_space)
 	clip_space.position.x /= clip_space.position.w;
 	clip_space.position.y /= clip_space.position.w;
 	clip_space.position.z /= clip_space.position.w;
+	clip_space.position.w = 1 / clip_space.position.w;
 	return clip_space;
 }
 

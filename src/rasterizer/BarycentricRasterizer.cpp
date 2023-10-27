@@ -41,6 +41,7 @@ inline Vertex	toNDC(Vertex const &clip_space) {
 	ret.position.x /= ret.position.w;
 	ret.position.y /= ret.position.w;
 	ret.position.z /= ret.position.w;
+	ret.position.w /= 1 / ret.position.w;
 	return (ret);
 }
 
