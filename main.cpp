@@ -51,10 +51,11 @@ int	main(void) {
 	Matrix4x4		tmpModel;
 	DefaultShader	shader;
 
-	MatrixUtil::viewMatrix(view, Vector3(0, 200, -10), Vector3(0, -200, 10));
+	// MatrixUtil::viewMatrix(view, Vector3(0, 200, -10), Vector3(0, -200, 10));
 	MatrixUtil::tmpModelMatrix(tmpModel, 0);
 	MatrixUtil::perspectiveMatrix(projection, 90, 1, 0.3, 1000.0);
 	// MatrixUtil::viewMatrix(view, Vector3(0, 0, -1), Vector3(0, 0, 1));
+	MatrixUtil::viewMatrix(view, Vector3(0, 20, -10), Vector3(0, -20, 10));
 	shader.setViewMatrix(view);
 	shader.setProjectionMatrix(projection);
 	shader.setModelMatrix(tmpModel);
@@ -65,7 +66,7 @@ int	main(void) {
 	// mesh.get(1).position = Vector4(-0.5, -0.5, 1, 1);
 	// mesh.get(2).position = Vector4(0.5, -0.5, 1, 1);
 
-	// mesh.get(3).position = Vector4(-0.5, -0.5, 1, 1);
+	// mesh.get(3).position = Vector4(-0.5, 0.5, 1, 1);
 	// mesh.get(4).position = Vector4(0.5, -0.5, 1, 1);
 	// mesh.get(5).position = Vector4(0.5, 0.5, 1, 1);
 
@@ -76,7 +77,7 @@ int	main(void) {
 	// mesh.get(4).normal = Vector3(0.0, 0.0, 0.0);
 	// mesh.get(5).normal = Vector3(0.0, 0.0, 0.0);
 	
-	ParsingFile file("Dragon_2.obj");
+	ParsingFile file("dragon.obj");
 	Mesh mesh(file.getTrianglesSize() * 3);
 	int idx = 0;
 	for (int i = 0; i < file.getTrianglesSize(); i++)

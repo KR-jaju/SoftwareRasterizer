@@ -75,6 +75,51 @@ void ParsingFile::makeVertexNormal()
     }
 }
 
+// static
+// bool mystrncmp(char *line, char *cmp, int len)
+// {
+//     for (int i = 0; i < len; i++)
+//     {
+//         if (cmp[i] != line[i])
+//             return false;
+//     }
+//     return true;
+// }
+
+// static
+// void parsingVertex(char *line, char *str1, Vertex &ver)
+// {
+//     int start, end, idx, flag;
+//     start = 2;
+//     flag = 0;
+//     char *endl;
+//     while (line[start] != '\0')
+//     {
+//         end = start;
+//         idx = 0;
+//         while(line[end] != ' ')
+//         {
+//             str1[idx] = line[end];
+//             end++;
+//             idx++;
+//         }
+//         str1[idx] = '\0';
+//         if (flag == 0)
+//         {
+//             ver.position.x = strtof(str1, &endl);
+//             flag++;
+//         }
+//         else if (flag == 1)
+//         {
+//             ver.position.y = strtof(str1, &endl);
+//             flag++;
+//         }
+//         else
+//             ver.position.z = strtof(str1, &endl);
+//         start = end + 1;
+//     }
+// }
+
 void ParsingFile::readFile()
 {
     char* c_line = nullptr;
