@@ -55,7 +55,7 @@ int	main(void) {
 	MatrixUtil::tmpModelMatrix(tmpModel, 0);
 	MatrixUtil::perspectiveMatrix(projection, 90, 1, 0.3, 1000.0);
 	// MatrixUtil::viewMatrix(view, Vector3(0, 0, -1), Vector3(0, 0, 1));
-	MatrixUtil::viewMatrix(view, Vector3(0, 20, -10), Vector3(0, -20, 10));
+	MatrixUtil::viewMatrix(view, Vector3(0, 10, -10), Vector3(0, -10, 10));
 	shader.setViewMatrix(view);
 	shader.setProjectionMatrix(projection);
 	shader.setModelMatrix(tmpModel);
@@ -78,16 +78,11 @@ int	main(void) {
 	// mesh.get(5).normal = Vector3(0.0, 0.0, 0.0);
 	
 	ParsingFile file("dragon.obj");
-	Mesh mesh(file.getTrianglesSize() * 3);
-	int idx = 0;
+	// ParsingFile file("Dragon_2.obj");
+	Mesh mesh(file.getTrianglesSize());
 	for (int i = 0; i < file.getTrianglesSize(); i++)
 	{
-		for (int j = 0; j < 3; j++)
-		{
-			mesh.get(idx).position = file.getVerticiesFactor(file.getTrianglesFactor(i)[j]).position;
-			mesh.get(idx).normal = file.getVerticiesFactor(file.getTrianglesFactor(i)[j]).normal;
-			idx++;	
-		}
+		mesh.get(i) = file.getTrianglesFactor(i);
 	}
 	std::cout << "start rasterizer....\n";
 	Rasterizer	*rasterizer = new StandardRasterizer(512, 512);

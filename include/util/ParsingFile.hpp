@@ -11,17 +11,16 @@ class ParsingFile
 {
     private:
         std::string file_name;
-        std::string line;
-        std::vector<Vertex> vertices;
-        std::vector<std::vector<float> > triangles;
+        std::vector<Vector3> vertices;
+        std::vector<Vertex> triangles;
+        std::vector<Vector3> normals;
         void readFile();
         void makeVertexNormal();
+        void parsingTriangle(char *line, char *str1, std::vector<Vertex>& vec);
     public:
         ParsingFile(std::string file_name);
         ~ParsingFile();
-        Vertex getVerticiesFactor(int index);
-        std::vector<float> getTrianglesFactor(int index);
-        int getVerticesSize();
+        Vertex getTrianglesFactor(int index);
         int getTrianglesSize();
 };
 #endif
