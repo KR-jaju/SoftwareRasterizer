@@ -124,8 +124,6 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 			u = cross(tmp_b, tmp_c, p) / area;
 			v = cross(tmp_c, tmp_a, p) / area;
 			w = 1 - u - v;
-			if (!(0 <= u && u <= 1 && 0 <= v && v <= 1 && 0 <= w && w <= 1))
-				continue;
 			Vertex	fragment = Vertex::mix(vec[0], vec[1], vec[2], u, v, w);
 			if (depthTest(i, j, fragment) == false) continue;
 			shader->fragment(fragment, this->target->pixelColor(j, i));
