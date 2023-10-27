@@ -55,12 +55,22 @@ Quaternion	Quaternion::operator*(Quaternion const &q) const{
 	return (ret);
 }
 
+Quaternion	Quaternion::operator*(Vector3 const &v) const {
+	Quaternion	q(0, v.x, v.y, v.z);
+
+	return *this * q;
+}
+
 Quaternion	Quaternion::operator~() const {
 	return (Quaternion(this->w, -this->x, -this->y, -this->z));
 }
 
 Quaternion	Quaternion::inverse() const {
 	return (~*this / this->sqrMagnitude());
+}
+
+Quaternion::operator	Vector3() const {
+	return (Vector3(this->x, this->y, this->z));
 }
 
 float	Quaternion::sqrMagnitude() const {
