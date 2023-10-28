@@ -14,7 +14,7 @@ struct Quaternion {
 	Quaternion	operator-(Quaternion const &q) const;
 	Quaternion	operator*(float f) const;
 	Quaternion	operator*(Quaternion const &q) const;
-	Quaternion	operator*(Vector3 const &v) const;
+	Vector3		operator*(Vector3 const &v) const;
 	Quaternion	operator/(float f) const;
 	Quaternion	operator~() const;
 	Quaternion	inverse() const;

@@ -55,10 +55,10 @@ Quaternion	Quaternion::operator*(Quaternion const &q) const{
 	return (ret);
 }
 
-Quaternion	Quaternion::operator*(Vector3 const &v) const {
+Vector3	Quaternion::operator*(Vector3 const &v) const {
 	Quaternion	q(0, v.x, v.y, v.z);
 
-	return *this * q;
+	return *this * q * ~*this;
 }
 
 Quaternion	Quaternion::operator~() const {
