@@ -2,6 +2,41 @@
 #include "util/MatrixUtil.hpp"
 #include <cmath>
 
+void	MatrixUtil::identity(Matrix4x4 &mat) {
+	for (int r = 0; r < 4; r++) {
+		for (int c = 0; c < 4; c++) {
+			if (r == c)
+				mat.m[r][c] = 1;
+			else
+				mat.m[r][c] = 0;
+		}
+	}
+}
+
+void	MatrixUtil::scaleMatrix(Matrix4x4 &mat, Vector3 const &scale) {
+	for (int r = 0; r < 3; r++) {
+		mat.m[r][0] *= scale.x;
+		mat.m[r][1] *= scale.y;
+		mat.m[r][2] *= scale.z;
+	}
+}
+
+void	MatrixUtil::rotateMatrix(Matrix4x4 &mat, Quaternion const &rotation) {
+	for (int c = 0; c < 3; c++) {
+		Vector3 const	row = rotation * Vector3(mat.m[0][c], mat.m[1][c], mat.m[2][c]);
+
+		mat.m[0][c] = row.x;
+		mat.m[1][c] = row.y;
+		mat.m[2][c] = row.z;
+	}
+}
+
+void	MatrixUtil::translateMatrix(Matrix4x4 &mat, Vector3 const &translation) {
+	mat.m[0][3] += translation.x;
+	mat.m[1][3] += translation.y;
+	mat.m[2][3] += translation.z;
+}
+
 void	MatrixUtil::viewMatrix(Matrix4x4 &ref, Vector3 const &pos, Vector3 const &dir) {
 	Vector3	forward = dir.normalized();
 	Vector3	right = Vector3(0, 1, 0).cross(forward).normalized();
@@ -47,6 +82,13 @@ void	MatrixUtil::tmpModelMatrix(Matrix4x4 &m, float degree)
 	m.m[3][1] = 0;
 	m.m[3][2] = 0;
 	m.m[3][3] = 1;
+}
+
+void	MatrixUtil::modelMatrix(Matrix4x4 &m, Vector3 const &translation, Quaternion const &rotation, Vector3 const &scale) {
+	MatrixUtil::identity(m);
+	MatrixUtil::scaleMatrix(m, scale);
+	MatrixUtil::rotateMatrix(m, rotation);
+	MatrixUtil::translateMatrix(m, translation);
 }
 
 void	MatrixUtil::perspectiveMatrix(Matrix4x4 &ref, float fov, float aspect, float near, float far) {

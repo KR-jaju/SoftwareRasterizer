@@ -47,12 +47,10 @@ int	main(void) {
 	vars.image = mlx_new_image(vars.mlx, 512, 512);
 	vars.data = (int *)mlx_get_data_addr(vars.image, &(vars.tmp), &(vars.tmp), &(vars.tmp));
 
-	Quaternion test = QuaternionUtil::rotation(Vector3(0, 1, 0), 22.5f);
-	Vector3	forward(0, 0, 1);
-	Vector3 rotated = test * forward * ~test;
+	Quaternion test = QuaternionUtil::rotation(Vector3(1, 0, 0), 45.0f);
+	Vector3	forward(1, 0, 1);
+	Vector3 rotated = test * forward;
 	std::cout << rotated.x << ","<< rotated.y << "," << rotated.z << std::endl;
-
-
 
 	Matrix4x4		view;
 	Matrix4x4		projection;
@@ -60,7 +58,8 @@ int	main(void) {
 	DefaultShader	shader;
 
 	// MatrixUtil::viewMatrix(view, Vector3(0, 200, -10), Vector3(0, -200, 10));
-	MatrixUtil::tmpModelMatrix(tmpModel, 0);
+	// MatrixUtil::tmpModelMatrix(tmpModel, 0);
+	MatrixUtil::modelMatrix(tmpModel, Vector3(2, 0, 5), QuaternionUtil::rotation(Vector3(0, 1, 0), 20), Vector3(1, 1, 1));
 	MatrixUtil::perspectiveMatrix(projection, 90, 1, 6.6, 1000.0);
 	// MatrixUtil::viewMatrix(view, Vector3(0, 0, -1), Vector3(0, 0, 1));
 	MatrixUtil::viewMatrix(view, Vector3(0, 5, -10), Vector3(0, 0, 1));
