@@ -17,4 +17,15 @@ public:
 	virtual void	blit(int *dst) = 0;
 };
 
+enum class DepthFunc {
+	NEVER,
+	LESS,
+	EQUAL,
+	LEQUAL,
+	GREATER,
+	NOT_EQUAL,
+	GEQUAL,
+	ALWAYS
+};
+
 #endif
