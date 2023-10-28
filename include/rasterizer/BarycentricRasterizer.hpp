@@ -11,6 +11,7 @@ private:
 	int		width;
 	int		height;
 	RenderTexture	*target;
+	bool	test_depth;
 	bool	depthTest(int x, int y, Vertex const &fragment);
 	void	drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *shader);
 	void	drawPolygon(std::queue<Vertex> &polygon, Shader *shader);

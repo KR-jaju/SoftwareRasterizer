@@ -11,6 +11,7 @@ BarycentricRasterizer::BarycentricRasterizer(int width, int height) {
 	this->width = width;
 	this->height = height;
 	this->target = nullptr;
+	this->test_depth = true;
 }
 
 BarycentricRasterizer::~BarycentricRasterizer() {}
@@ -41,7 +42,7 @@ inline Vertex	toNDC(Vertex const &clip_space) {
 	ret.position.x /= ret.position.w;
 	ret.position.y /= ret.position.w;
 	ret.position.z /= ret.position.w;
-	ret.position.w /= 1 / ret.position.w;
+	ret.position.w = 1 / ret.position.w;
 	return (ret);
 }
 
@@ -84,7 +85,7 @@ void	BarycentricRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader
 			float	w = 1 - u - v;
 			if (0 <= u && u <= 1 && 0 <= v && v <= 1 && 0 <= w && w <= 1) {
 				Vertex	fragment = Vertex::mix(a, b, c, u, v, w);
-				if (!this->depthTest(x, y, fragment))
+				if (this->test_depth && !this->depthTest(x, y, fragment))
 					continue;
 				shader->fragment(fragment, this->target->pixelColor(x, y));
 			}
