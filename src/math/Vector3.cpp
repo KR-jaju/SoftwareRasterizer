@@ -1,4 +1,3 @@
-
 #include "math/Vector3.hpp"
 #include <cmath>
 
@@ -8,7 +7,7 @@ Vector3::Vector3() {
 	this->z = 0;
 }
 
-Vector3::Vector3(float x, float y, float z) {
+Vector3::Vector3(_float x, _float y, _float z) {
 	this->x = x;
 	this->y = y;
 	this->z = z;
@@ -49,7 +48,7 @@ Vector3	Vector3::operator-() const {
 	return (Vector3(-this->x, -this->y, -this->z));
 }
 
-Vector3	Vector3::operator*(float f) const {
+Vector3	Vector3::operator*(_float f) const {
 	Vector3	ret;
 
 	ret.x = this->x * f;
@@ -58,11 +57,11 @@ Vector3	Vector3::operator*(float f) const {
 	return (ret);
 }
 
-float	Vector3::operator*(const Vector3 &ref) const {
+_float	Vector3::operator*(const Vector3 &ref) const {
 	return (this->x * ref.x + this->y * ref.y + this->z * ref.z);
 }
 
-Vector3	Vector3::operator/(float f) const {
+Vector3	Vector3::operator/(_float f) const {
 	Vector3	ret;
 
 	ret.x = this->x / f;
@@ -80,12 +79,12 @@ Vector3	Vector3::cross(Vector3 const &ref) const {
 	return (ret);
 }
 
-float	Vector3::lengthSqr() const {
+_float	Vector3::lengthSqr() const {
 	return (*this * *this);
 }
 
-float	Vector3::length() const {
-	return (sqrtf(this->lengthSqr()));
+_float	Vector3::length() const {
+	return ((this->lengthSqr()).sqrt());
 }
 
 Vector3	Vector3::normalized() const {

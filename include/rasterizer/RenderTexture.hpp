@@ -9,13 +9,13 @@ private:
 	int		width;
 	int		height;
 	Vector4	*color;
-	float	*depth;
+	_float	*depth;
 public:
 	RenderTexture(int width, int height);
 	~RenderTexture();
-	void	clear(Vector4 const &color, float depth);
+	void	clear(Vector4 const &color, _float depth);
 	Vector4	&pixelColor(int x, int y);
-	float	&pixelDepth(int x, int y);
+	_float	&pixelDepth(int x, int y);
 };
 
 #endif

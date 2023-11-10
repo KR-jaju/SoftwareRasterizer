@@ -4,19 +4,19 @@
 static
 bool checkInPlane(Vertex &point, Vector4 &axis)
 {
-    float check = point.position * axis;
+    _float check = point.position * axis;
     return (check <= point.position.w);
 }
 
 static
 Vertex makeInterSection(Vertex &p1, Vertex &p2, Vector4 &axis)
 {
-    float a0 = p1.position * axis;
-    float a1 = p2.position * axis;
-    float diff_a = a1 - a0;
-    float diff_w = p2.position.w - p1.position.w;
-    float diff_w0_a0 = p1.position.w - a0;
-    float t = diff_w0_a0 / (diff_a - diff_w);
+    _float a0 = p1.position * axis;
+    _float a1 = p2.position * axis;
+    _float diff_a = a1 - a0;
+    _float diff_w = p2.position.w - p1.position.w;
+    _float diff_w0_a0 = p1.position.w - a0;
+    _float t = diff_w0_a0 / (diff_a - diff_w);
     return Vertex::mix(p1, p2, t); 
 }
 

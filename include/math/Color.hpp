@@ -2,20 +2,22 @@
 #ifndef COLOR_HPP
 # define COLOR_HPP
 
+#include "fixedPoint.hpp"
+
 struct Color {
-	float	r;
-	float	g;
-	float	b;
-	float	a;
+	_float	r;
+	_float	g;
+	_float	b;
+	_float	a;
 	Color() {}
-	Color(float r, float g, float b, float a);
-	operator	int() const;
+	Color(_float r, _float g, _float b, _float a);
+	operator	int();
 	Color	operator+(const Color &ref) const;
 	Color	operator-(const Color &ref) const;
 	Color	operator-() const;
-	Color	operator*(float f) const;
+	Color	operator*(_float f) const;
 	Color	operator*(const Color &ref) const;
-	Color	operator/(float f) const;
+	Color	operator/(_float f) const;
 };
 
 

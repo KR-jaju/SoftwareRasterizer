@@ -17,7 +17,7 @@ BarycentricRasterizer::BarycentricRasterizer(int width, int height) {
 BarycentricRasterizer::~BarycentricRasterizer() {}
 
 static
-float	min(float a, float b, float c) {
+_float	min(_float a, _float b, _float c) {
 	if (a > b)
 		a = b;
 	if (a > c)
@@ -26,7 +26,7 @@ float	min(float a, float b, float c) {
 }
 
 static
-float	max(float a, float b, float c) {
+_float	max(_float a, _float b, _float c) {
 	if (a < b)
 		a = b;
 	if (a < c)
@@ -37,12 +37,14 @@ float	max(float a, float b, float c) {
 static
 inline Vertex	toNDC(Vertex const &clip_space) {
 	Vertex	ret;
+	_float one;
 
+	one.setNumber(1);
 	ret = clip_space;
 	ret.position.x /= ret.position.w;
 	ret.position.y /= ret.position.w;
 	ret.position.z /= ret.position.w;
-	ret.position.w = 1 / ret.position.w;
+	ret.position.w = one / ret.position.w;
 	return (ret);
 }
 
@@ -54,12 +56,12 @@ inline Vector4	toScreenSpace(Vector4 a, int width, int height) {
 }
 
 static
-inline float	cross(Vector4 &a, Vector4 &b, Vector4 &c) {
+inline _float	cross(Vector4 &a, Vector4 &b, Vector4 &c) {
 	return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
 }
 
 bool	BarycentricRasterizer::depthTest(int x, int y, Vertex const &fragment) {
-	float	&storedDepth = this->target->pixelDepth(x, y);
+	_float	&storedDepth = this->target->pixelDepth(x, y);
 
 	if (storedDepth <= fragment.position.z)
 		return (false);
@@ -71,19 +73,19 @@ void	BarycentricRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader
 	Vector4	screen_a = toScreenSpace(a.position, this->width, this->height);
 	Vector4	screen_b = toScreenSpace(b.position, this->width, this->height);
 	Vector4 screen_c = toScreenSpace(c.position, this->width, this->height);
-	int		x_min = std::max(static_cast<int>(roundf(min(screen_a.x, screen_b.x, screen_c.x))), 0);
-	int		x_max = std::min(static_cast<int>(roundf(max(screen_a.x, screen_b.x, screen_c.x))), this->width - 1);
-	int		y_min = std::max(static_cast<int>(roundf(min(screen_a.y, screen_b.y, screen_c.y))), 0);
-	int		y_max = std::min(static_cast<int>(roundf(max(screen_a.y, screen_b.y, screen_c.y))), this->height - 1);
-	float	area = cross(screen_a, screen_b, screen_c);
+	int		x_min = std::max(static_cast<int>(min(screen_a.x, screen_b.x, screen_c.x).round().getReal()), 0);
+	int		x_max = std::min(static_cast<int>(max(screen_a.x, screen_b.x, screen_c.x).round().getReal()), this->width - 1);
+	int		y_min = std::max(static_cast<int>(min(screen_a.y, screen_b.y, screen_c.y).round().getReal()), 0);
+	int		y_max = std::min(static_cast<int>(max(screen_a.y, screen_b.y, screen_c.y).round().getReal()), this->height - 1);
+	_float	area = cross(screen_a, screen_b, screen_c);
 
 	for (int y = y_min; y <= y_max; y++) {
 		for (int x = x_min; x <= x_max; x++) {
 			Vector4	p(x, y, 0, 1);
-			float	u = cross(screen_b, screen_c, p) / area;
-			float	v = cross(screen_c, screen_a, p) / area;
-			float	w = 1 - u - v;
-			if (0 <= u && u <= 1 && 0 <= v && v <= 1 && 0 <= w && w <= 1) {
+			_float	u = cross(screen_b, screen_c, p) / area;
+			_float	v = cross(screen_c, screen_a, p) / area;
+			_float	w = -u - v + 1;
+			if (u >= 0 && u <= 1 && v >= 0 && v <= 1 && w >= 0 && w <= 1) {
 				Vertex	fragment = Vertex::mix(a, b, c, u, v, w);
 				if (this->test_depth && !this->depthTest(x, y, fragment))
 					continue;

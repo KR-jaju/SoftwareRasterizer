@@ -25,7 +25,7 @@ bool cmp(Vertex &v1, Vertex &v2)
 {
 	if (v1.position.y < v2.position.y)
 		return false;
-	if (v1.position.y == v2.position.y)
+	if (v1.position.y.same(v2.position.y, 0))
 	{
 		return v1.position.x < v2.position.x;
 	}
@@ -33,7 +33,7 @@ bool cmp(Vertex &v1, Vertex &v2)
 }
 
 static
-inline float cross(Vector4 &a, Vector4 &b, Vector4 &c) 
+inline _float cross(Vector4 &a, Vector4 &b, Vector4 &c) 
 {
 	return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
 }
@@ -48,7 +48,7 @@ inline Vector4	toScreenSpace(Vector4 a, int width, int height)
 
 bool StandardRasterizer::depthTest(int y, int x, Vertex &fragment)
 {
-	float &storedDepth = target->pixelDepth(x, y);
+	_float &storedDepth = target->pixelDepth(x, y);
 	if (storedDepth <= fragment.position.z)
 		return false;
 	storedDepth = fragment.position.z;
@@ -56,13 +56,14 @@ bool StandardRasterizer::depthTest(int y, int x, Vertex &fragment)
 }
 
 static
-int	roundUpInt(float a) {
-	return int(roundf(a));
+int	roundUpInt(_float a) {
+	return int(a.round().getReal());
 }
 
 static
-int	roundDownInt(float a) {
-	return int(1 - roundf(1 - a));
+int	roundDownInt(_float a) {
+	_float res = -a + 1;
+	return int((-res.round() + 1).getReal());
 }
 
 void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *shader)
@@ -76,22 +77,22 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 	Vector4 tmp_a = toScreenSpace(vec[0].position, this->width, this->height);
 	Vector4 tmp_b = toScreenSpace(vec[1].position, this->width, this->height);
 	Vector4 tmp_c = toScreenSpace(vec[2].position, this->width, this->height);
-	float slope1 = (tmp_a.x - tmp_b.x) / (tmp_a.y - tmp_b.y);
-	float slope2 = (tmp_a.x - tmp_c.x) / (tmp_a.y - tmp_c.y);
+	_float slope1 = (tmp_a.x - tmp_b.x) / (tmp_a.y - tmp_b.y);
+	_float slope2 = (tmp_a.x - tmp_c.x) / (tmp_a.y - tmp_c.y);
 
-	float tmpX = tmp_a.x;
-	float tmpX2 = tmpX;
+	_float tmpX = tmp_a.x;
+	_float tmpX2 = tmpX;
 
-	float u, v, w, area;
+	_float u, v, w, area;
 	area = cross(tmp_a, tmp_b, tmp_c);
 
-	if (tmp_a.y != tmp_b.y)
+	if (tmp_a.y.same(tmp_b.y, 0.0001) == false)
 	{
 		for (int i = roundDownInt(tmp_a.y); i < roundDownInt(tmp_b.y); i++)
 		{
 			int	from, to;
-			tmpX = tmp_a.x + slope1 * (i + 0.5 - tmp_a.y);
-			tmpX2 = tmp_a.x + slope2 * (i + 0.5 - tmp_a.y);
+			tmpX = tmp_a.x + slope1 * (-tmp_a.y + i + 0.5);
+			tmpX2 = tmp_a.x + slope2 * (-tmp_a.y + i + 0.5);
 
 			from = min(roundDownInt(tmpX), roundDownInt(tmpX2));
 			to = max(roundDownInt(tmpX), roundDownInt(tmpX2));
@@ -100,7 +101,7 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 				Vector4 p(j + 0.5, i + 0.5, 0, 1);
 				u = cross(tmp_b, tmp_c, p) / area;
 				v = cross(tmp_c, tmp_a, p) / area;
-				w = 1 - u - v;
+				w = -u - v + 1;
 				Vertex fragment = Vertex::mix(vec[0], vec[1], vec[2], u, v, w);
 				if (depthTest(i, j, fragment) == false) continue;
 				shader->fragment(fragment, this->target->pixelColor(j, i));
@@ -109,13 +110,13 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 	}
 
 	slope1 = (tmp_c.x - tmp_b.x) / (tmp_c.y - tmp_b.y);
-	if (tmp_c.y == tmp_b.y)
+	if (tmp_c.y.same(tmp_b.y, 0.0001) == true)
 		return ;
 	for (int i = roundUpInt(tmp_c.y) - 1; i >= roundDownInt(tmp_b.y); i--)
 	{
 		int	from, to;
-		tmpX = tmp_c.x + slope1 * (i + 0.5 - tmp_c.y);
-		tmpX2 = tmp_c.x + slope2 * (i + 0.5 - tmp_c.y);
+		tmpX = tmp_c.x + slope1 * (-tmp_c.y + i + 0.5);
+		tmpX2 = tmp_c.x + slope2 * (-tmp_c.y + i + 0.5);
 		from = min(roundDownInt(tmpX), roundDownInt(tmpX2));
 		to = max(roundDownInt(tmpX), roundDownInt(tmpX2));
 		for (int j = from; j < to; j++)
@@ -123,7 +124,7 @@ void StandardRasterizer::drawTriangle(Vertex &a, Vertex &b, Vertex &c, Shader *s
 			Vector4	p(j + 0.5, i + 0.5, 0, 1);
 			u = cross(tmp_b, tmp_c, p) / area;
 			v = cross(tmp_c, tmp_a, p) / area;
-			w = 1 - u - v;
+			w = -u - v + 1;
 			Vertex	fragment = Vertex::mix(vec[0], vec[1], vec[2], u, v, w);
 			if (depthTest(i, j, fragment) == false) continue;
 			shader->fragment(fragment, this->target->pixelColor(j, i));
@@ -149,10 +150,12 @@ void	StandardRasterizer::setTarget(RenderTexture *rt) {
 static
 inline Vertex toNDC(Vertex clip_space)
 {
+	_float one;
+	one.setNumber(1);
 	clip_space.position.x /= clip_space.position.w;
 	clip_space.position.y /= clip_space.position.w;
 	clip_space.position.z /= clip_space.position.w;
-	clip_space.position.w = 1 / clip_space.position.w;
+	clip_space.position.w = one / clip_space.position.w;
 	return clip_space;
 }
 

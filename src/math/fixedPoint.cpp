@@ -22,30 +22,36 @@ void displayBit(unsigned long long num)
 
 fixedPoint::fixedPoint() {
     this->pushNum = 20;
+    this->isInf = 0;
 }
 
 fixedPoint::fixedPoint(int n) {
     this->pushNum = 20;
+    this->isInf = 0;
     this->setNumber(double(n));
 }
 
 fixedPoint::fixedPoint(ll n) {
     this->pushNum = 20;
+    this->isInf = 0;
     this->setNumber(double(n));
 }
 
 fixedPoint::fixedPoint(ull n) {
     this->pushNum = 20;
+    this->isInf = 0;
     this->setNumber(double(n));
 }
 
 fixedPoint::fixedPoint(float n) {
     this->pushNum = 20;
+    this->isInf = 0;
     this->setNumber(n);
 }
 
 fixedPoint::fixedPoint(double n) {
     this->pushNum = 20;
+    this->isInf = 0;
     this->setNumber(n);
 }
 
@@ -92,6 +98,11 @@ void fixedPoint::setNumber(ll n) {
     setNumber(this->real);
 }
 
+void fixedPoint::setNumber(int n) {
+    this->real = (double)n;
+    setNumber(this->real);
+}
+
 fixedPoint& fixedPoint::operator=(fixedPoint const &ref) {
     this->real = ref.real;
     this->sign = ref.sign;
@@ -99,14 +110,6 @@ fixedPoint& fixedPoint::operator=(fixedPoint const &ref) {
     this->upNumber = ref.upNumber;
     this->downNumber = ref.downNumber;
 
-    return *this;
-}
-
-fixedPoint& fixedPoint::operator=(int const &n) {
-    fixedPoint ref;
-
-    ref.setNumber(ll(n));
-    *this = ref;
     return *this;
 }
 
@@ -134,6 +137,14 @@ fixedPoint& fixedPoint::operator=(float const &n) {
     return *this;
 }
 
+fixedPoint& fixedPoint::operator=(int const &n) {
+    fixedPoint ref;
+
+    ref.setNumber(n);
+    *this = ref;
+    return *this;
+}
+
 void fixedPoint::showNumber() {
     ull mask = 1;
     ull resUpThis = (upNumber << (32 - pushNum)) + (downNumber >> (pushNum));
@@ -144,14 +155,20 @@ void fixedPoint::showNumber() {
     std::cout << "decimal part: " << float(resDownThis) / (mask << pushNum) << std::endl;
 }
 
-double fixedPoint::getReal() {
+double fixedPoint::getReal() const {
     return this->real;
 }
 
-fixedPoint fixedPoint::operator*(fixedPoint ref) {
+fixedPoint fixedPoint::operator*(fixedPoint ref) const {
     ull mask = 1;
     fixedPoint result;
 
+    if (ref.isInf) {
+        result.sign = ref.sign * this->sign;
+        result.isInf = 1;
+        result.real = INFINITY;
+        return result;
+    }
     result.upNumber = (this->upNumber * ref.upNumber) << 32;
     result.upNumber += this->upNumber * ref.downNumber + this->downNumber * ref.upNumber;
 
@@ -174,7 +191,7 @@ fixedPoint& fixedPoint::operator*=(fixedPoint ref) {
     return *this;
 }
 
-fixedPoint fixedPoint::operator%(fixedPoint ref) {
+fixedPoint fixedPoint::operator%(fixedPoint ref) const {
     ull completThis = ((this->upNumber) << 32) + this->downNumber;
     ull completeRef = (ref.upNumber << 32) + ref.downNumber;
     ull res = completThis % completeRef;
@@ -189,11 +206,16 @@ fixedPoint& fixedPoint::operator%=(fixedPoint ref) {
     return *this;
 }
 
-fixedPoint fixedPoint::operator/(fixedPoint ref) {
+fixedPoint fixedPoint::operator/(fixedPoint ref) const {
     ull res;
     ull op = (ref.upNumber << 32) + ref.downNumber;
     fixedPoint result;
 
+    if (op == 0) {
+        result.isInf = 1;
+        result.real = INFINITY;
+        return result;
+    }
     res = (this->upNumber << 32) + this->downNumber;
     ull decimal = res / op;
     ull down = res % op;
@@ -210,7 +232,7 @@ fixedPoint& fixedPoint::operator/=(fixedPoint ref) {
     return *this;
 }
 
-fixedPoint fixedPoint::operator+(fixedPoint ref) {
+fixedPoint fixedPoint::operator+(fixedPoint ref) const {
     fixedPoint result;
     
     ll res;
@@ -238,7 +260,7 @@ fixedPoint& fixedPoint::operator+=(fixedPoint ref) {
     return *this;
 }
 
-fixedPoint fixedPoint::operator-(fixedPoint ref) {
+fixedPoint fixedPoint::operator-(fixedPoint ref) const {
     fixedPoint result;
     ll res;
 
@@ -260,12 +282,16 @@ fixedPoint fixedPoint::operator-(fixedPoint ref) {
     return result;
 }
 
+fixedPoint fixedPoint::operator-() const {
+    return ((*this) * -1);
+}
+
 fixedPoint& fixedPoint::operator-=(fixedPoint ref) {
     *this = *this - ref;
     return *this;
 }
 
-bool fixedPoint::operator<(fixedPoint ref) {
+bool fixedPoint::operator<(fixedPoint ref) const {
     ull comThis = (this->upNumber << 32) + this->downNumber;
     ull comRef = (ref.upNumber << 32) + ref.downNumber;
     
@@ -281,7 +307,7 @@ bool fixedPoint::operator<(fixedPoint ref) {
     return comThis < comRef;
 }
 
-bool fixedPoint::operator<=(fixedPoint ref) {
+bool fixedPoint::operator<=(fixedPoint ref) const {
     ull comThis = (this->upNumber << 32) + this->downNumber;
     ull comRef = (ref.upNumber << 32) + ref.downNumber;
     
@@ -297,7 +323,7 @@ bool fixedPoint::operator<=(fixedPoint ref) {
     return comThis <= comRef;
 }
 
-bool fixedPoint::operator>(fixedPoint ref) {
+bool fixedPoint::operator>(fixedPoint ref) const {
     ull comThis = (this->upNumber << 32) + this->downNumber;
     ull comRef = (ref.upNumber << 32) + ref.downNumber;
     
@@ -313,7 +339,7 @@ bool fixedPoint::operator>(fixedPoint ref) {
     return comThis > comRef;
 }
 
-bool fixedPoint::operator>=(fixedPoint ref) {
+bool fixedPoint::operator>=(fixedPoint ref) const {
     ull comThis = (this->upNumber << 32) + this->downNumber;
     ull comRef = (ref.upNumber << 32) + ref.downNumber;
     
@@ -329,7 +355,20 @@ bool fixedPoint::operator>=(fixedPoint ref) {
     return comThis >= comRef;
 }
 
-fixedPoint fixedPoint::sin() {
+bool fixedPoint::same(fixedPoint ref, double bias) const {
+    if ((*this - ref).abs() <= bias)
+        return true;
+    return false;
+}
+
+fixedPoint fixedPoint::abs() const {
+    fixedPoint res = *this;
+    if (res.sign == -1)
+        res.sign = 1;
+    return res;
+}
+
+fixedPoint fixedPoint::sin() const {
     fixedPoint tmp, res, si, x, x_sqr;
 
     x.setNumber(M_PI);
@@ -354,7 +393,7 @@ fixedPoint fixedPoint::sin() {
     return res;
 }
 
-fixedPoint fixedPoint::cos() {
+fixedPoint fixedPoint::cos() const {
     fixedPoint tmp, res, si, x, x_sqr;
 
     x.setNumber(M_PI);
@@ -379,13 +418,13 @@ fixedPoint fixedPoint::cos() {
     return res;
 }
 
-fixedPoint fixedPoint::tan() {
+fixedPoint fixedPoint::tan() const {
     fixedPoint res;
     res = this->sin() / this->cos();
     return res;
 }
 
-fixedPoint fixedPoint::round() {
+fixedPoint fixedPoint::round() const {
     ull pivot = 524288;
     ull mask = 1;
     ull down = this->downNumber & ((mask << pushNum) - 1);
@@ -402,4 +441,20 @@ fixedPoint fixedPoint::round() {
     ull complete = (res.upNumber << 32) + res.downNumber;
     res.real = res.sign * double(complete) / (mask << pushNum);
     return res;
+}
+
+fixedPoint fixedPoint::sqrt() const {
+    fixedPoint mid, start, end, test;
+    end = *this;
+    start = 0;
+    mid = (end + start) / 2;
+    if ((mid * mid - *this).abs() <= 0.000001) return mid;
+    while ((start - end).abs() > 0.000001) {
+        mid = (end + start) / 2;
+        test = (mid * mid - *this).abs();
+        if (test <= 0.000001) break;
+        else if (mid * mid > *this) end = mid;
+        else start = mid;
+    }
+    return mid;
 }

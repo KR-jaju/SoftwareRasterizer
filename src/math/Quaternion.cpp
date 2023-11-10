@@ -2,7 +2,7 @@
 #include "math/Quaternion.hpp"
 #include <cmath>
 
-Quaternion::Quaternion(float w, float x, float y, float z) {
+Quaternion::Quaternion(_float w, _float x, _float y, _float z) {
 	this->w = w;
 	this->x = x;
 	this->y = y;
@@ -27,7 +27,7 @@ Quaternion	Quaternion::operator-(Quaternion const &q) const{
 	));
 }
 
-Quaternion	Quaternion::operator*(float f) const {
+Quaternion	Quaternion::operator*(_float f) const {
 		return (Quaternion(
 		this->w * f,
 		this->x * f,
@@ -36,7 +36,7 @@ Quaternion	Quaternion::operator*(float f) const {
 	));
 }
 
-Quaternion	Quaternion::operator/(float f) const {
+Quaternion	Quaternion::operator/(_float f) const {
 		return (Quaternion(
 		this->w / f,
 		this->x / f,
@@ -73,10 +73,10 @@ Quaternion::operator	Vector3() const {
 	return (Vector3(this->x, this->y, this->z));
 }
 
-float	Quaternion::sqrMagnitude() const {
+_float	Quaternion::sqrMagnitude() const {
 	return (this->x * this->x + this->y * this->y + this->z * this->z + this->w * this->w);
 }
 
-float	Quaternion::magnitude() const {
-	return (sqrt(this->sqrMagnitude()));
+_float	Quaternion::magnitude() const {
+	return ((this->sqrMagnitude()).sqrt());
 }

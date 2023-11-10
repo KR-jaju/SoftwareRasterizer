@@ -1,4 +1,3 @@
-
 #include "math/Matrix4x4.hpp"
 
 
@@ -13,7 +12,7 @@ Matrix4x4& Matrix4x4::operator=(const Matrix4x4 &ref) {
 	return (*this);
 }
 
-float	&Matrix4x4::operator[](int idx) {
+_float	&Matrix4x4::operator[](int idx) {
 	return (this->m[idx / 4][idx % 4]);
 }
 

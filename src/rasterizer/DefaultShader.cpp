@@ -34,7 +34,7 @@ void	DefaultShader::fragment(Vertex const &in, Vector4 &color) {
 	// color = Vector4(0.0, 1.0, 1.0, 0.0);
 	// color = (Color)in.normal;
 	color = Vector4(in.normal.normalized(), 0.0);
-	color = in.position;
+	// color = in.position;
 	// color = Vector4(1, 1, 1, 0) * in.position.z;
 	// color = color + Vector4(0.3, 0.3, 0.3, 0);
 	(void)in;

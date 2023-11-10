@@ -1,14 +1,13 @@
-
 #include "rasterizer/RenderTexture.hpp"
 
 RenderTexture::RenderTexture(int width, int height) {
 	this->width = width;
 	this->height = height;
 	this->color = new Vector4[width * height];
-	this->depth = new float[width * height];
+	this->depth = new _float[width * height];
 }
 
-void	RenderTexture::clear(Vector4 const &color, float depth) {
+void	RenderTexture::clear(Vector4 const &color, _float depth) {
 	for (int y = 0; y < height; y++) {
 		for (int x = 0; x < width; x++) {
 			this->color[x + y * width] = color;
@@ -26,6 +25,6 @@ Vector4	&RenderTexture::pixelColor(int x, int y) {
 	return (this->color[x + y * this->width]);
 }
 
-float	&RenderTexture::pixelDepth(int x, int y) {
+_float	&RenderTexture::pixelDepth(int x, int y) {
 	return (this->depth[x + y * this->width]);
 }

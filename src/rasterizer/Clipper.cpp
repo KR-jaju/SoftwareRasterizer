@@ -3,20 +3,19 @@
 
 static
 bool	isInside(Vertex const &vertex, Vector4 const &axis) {
-	float const	w = vertex.position.w;
-	float const	v = vertex.position * axis;
+	_float const	w = vertex.position.w;
+	_float const	v = vertex.position * axis;
 
 	return (v <= w);
 }
 
 static
 Vertex	boundary(Vertex const &a, Vertex const &b, Vector4 const &axis) {
-	float const	a0 = a.position * axis;
-	float const	b0 = b.position * axis;
-	float const diff_a = a0 - a.position.w;
-	float const diff_b = b0 - b.position.w;
-	float const	t = diff_a / (diff_a - diff_b);
-
+	_float const	a0 = a.position * axis;
+	_float const	b0 = b.position * axis;
+	_float const diff_a = a0 - a.position.w;
+	_float const diff_b = b0 - b.position.w;
+	_float const	t = diff_a / (diff_a - diff_b);
 	return Vertex::mix(a, b, t);
 }
 
@@ -37,12 +36,14 @@ void	clipPlane(std::queue<Vertex> &queue, Vector4 const &axis) {
 		queue.pop();
 		Vertex intersection = boundary(curr, next, axis);
 		if (isInside(next, axis)) {
-			if (!isInside(curr, axis))
+			if (!isInside(curr, axis)) {
 				queue.push(intersection);
+			}
 			queue.push(next);
 		}
-		else if (isInside(curr, axis))
+		else if (isInside(curr, axis)) {
 			queue.push(intersection);
+		}
 	}
 }
 

@@ -5,6 +5,7 @@
 #include "Clipper.hpp"
 #include "Vertex.hpp"
 #include "RenderTexture.hpp"
+#include "math/fixedPoint.hpp"
 
 class StandardRasterizer : public Rasterizer
 {

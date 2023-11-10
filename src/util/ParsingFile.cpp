@@ -37,7 +37,7 @@ void ParsingFile::makeVertexNormal()
         v1 = makeVector(triangles[i].position, triangles[i + 1].position);
         v2 = makeVector(triangles[i].position, triangles[i + 2].position);
         normal = makeNormal(v1, v2);
-        if (triangles[i].normal.x == 0 && triangles[i].normal.y == 0 && triangles[i].normal.z == 0)
+        if (triangles[i].normal.x.same(0, 0) && triangles[i].normal.y.same(0, 0) && triangles[i].normal.z.same(0, 0))
             triangles[i].normal = normal;
         else
         {
@@ -49,7 +49,7 @@ void ParsingFile::makeVertexNormal()
         v1 = makeVector(triangles[i + 1].position, triangles[i + 2].position);
         v2 = makeVector(triangles[i + 1].position, triangles[i].position);
         normal = makeNormal(v1, v2);
-        if (triangles[i + 1].normal.x == 0 && triangles[i + 1].normal.y == 0 && triangles[i + 1].normal.z == 0)
+        if (triangles[i + 1].normal.x.same(0, 0) && triangles[i + 1].normal.y.same(0, 0) && triangles[i + 1].normal.z.same(0, 0))
             triangles[i + 1].normal = normal;
         else
         {
@@ -61,7 +61,7 @@ void ParsingFile::makeVertexNormal()
         v1 = makeVector(triangles[i + 2].position, triangles[i].position);
         v2 = makeVector(triangles[i + 2].position, triangles[i + 1].position);
         normal = makeNormal(v1, v2);
-        if (triangles[i + 2].normal.x == 0 && triangles[i + 2].normal.y == 0 && triangles[i + 2].normal.z == 0)
+        if (triangles[i + 2].normal.x.same(0, 0) && triangles[i + 2].normal.y.same(0, 0) && triangles[i + 2].normal.z.same(0, 0))
             triangles[i + 2].normal = normal;
         else
         {
