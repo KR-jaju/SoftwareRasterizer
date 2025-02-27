@@ -9,8 +9,6 @@ VSOut must have these members:
 	float x, y, z, w; (clip space position)
 	T attrib (attribute, (operator+, operator* must be implemented))
 }
-
-
 */
 template <typename VSIn, typename VSOut, typename PSOut>
 class Rasterizer
