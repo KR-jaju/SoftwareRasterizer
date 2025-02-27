@@ -1,6 +1,4 @@
 .vscode/
 *.o
-/rasterizer
-libmlx.a
-Dragon_2.obj
+/build
 .DS_Store

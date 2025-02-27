@@ -1,8 +1,16 @@
 
-#include "math/Quaternion.hpp"
+#include "math/Quaternion.h"
 #include <cmath>
 
-Quaternion::Quaternion(_float w, _float x, _float y, _float z) {
+Quaternion createFromAxisAngle(Vector3 const& axis, float angle)
+{
+	float const	c = cosf(angle / 360 * M_PI);
+	float const	s = sinf(angle / 360 * M_PI);
+
+	return (Quaternion(c, axis.x * s, axis.y * s, axis.z * s));
+}
+
+Quaternion::Quaternion(float w, float x, float y, float z) {
 	this->w = w;
 	this->x = x;
 	this->y = y;
@@ -27,7 +35,7 @@ Quaternion	Quaternion::operator-(Quaternion const &q) const{
 	));
 }
 
-Quaternion	Quaternion::operator*(_float f) const {
+Quaternion	Quaternion::operator*(float f) const {
 		return (Quaternion(
 		this->w * f,
 		this->x * f,
@@ -36,7 +44,7 @@ Quaternion	Quaternion::operator*(_float f) const {
 	));
 }
 
-Quaternion	Quaternion::operator/(_float f) const {
+Quaternion	Quaternion::operator/(float f) const {
 		return (Quaternion(
 		this->w / f,
 		this->x / f,
@@ -73,10 +81,10 @@ Quaternion::operator	Vector3() const {
 	return (Vector3(this->x, this->y, this->z));
 }
 
-_float	Quaternion::sqrMagnitude() const {
+float	Quaternion::sqrMagnitude() const {
 	return (this->x * this->x + this->y * this->y + this->z * this->z + this->w * this->w);
 }
 
-_float	Quaternion::magnitude() const {
-	return ((this->sqrMagnitude()).sqrt());
+float	Quaternion::magnitude() const {
+	return (std::sqrt((this->sqrMagnitude())));
 }

@@ -1,4 +1,4 @@
-#include "math/Vector3.hpp"
+#include "math/Vector3.h"
 #include <cmath>
 
 Vector3::Vector3() {
@@ -7,7 +7,7 @@ Vector3::Vector3() {
 	this->z = 0;
 }
 
-Vector3::Vector3(_float x, _float y, _float z) {
+Vector3::Vector3(float x, float y, float z) {
 	this->x = x;
 	this->y = y;
 	this->z = z;
@@ -48,7 +48,7 @@ Vector3	Vector3::operator-() const {
 	return (Vector3(-this->x, -this->y, -this->z));
 }
 
-Vector3	Vector3::operator*(_float f) const {
+Vector3	Vector3::operator*(float f) const {
 	Vector3	ret;
 
 	ret.x = this->x * f;
@@ -57,11 +57,11 @@ Vector3	Vector3::operator*(_float f) const {
 	return (ret);
 }
 
-_float	Vector3::operator*(const Vector3 &ref) const {
+float	Vector3::operator*(const Vector3 &ref) const {
 	return (this->x * ref.x + this->y * ref.y + this->z * ref.z);
 }
 
-Vector3	Vector3::operator/(_float f) const {
+Vector3	Vector3::operator/(float f) const {
 	Vector3	ret;
 
 	ret.x = this->x / f;
@@ -79,12 +79,12 @@ Vector3	Vector3::cross(Vector3 const &ref) const {
 	return (ret);
 }
 
-_float	Vector3::lengthSqr() const {
+float	Vector3::lengthSqr() const {
 	return (*this * *this);
 }
 
-_float	Vector3::length() const {
-	return ((this->lengthSqr()).sqrt());
+float	Vector3::length() const {
+	return (std::sqrt(this->lengthSqr()));
 }
 
 Vector3	Vector3::normalized() const {
@@ -92,8 +92,3 @@ Vector3	Vector3::normalized() const {
 
 	return (ret / ret.length());
 }
-
-Vector3::operator Color() const {
-	return (Color (this->x, this->y, this->z, 0));
-}
-

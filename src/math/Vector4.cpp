@@ -1,5 +1,5 @@
 
-#include "math/Vector4.hpp"
+#include "math/Vector4.h"
 #include <cmath>
 
 Vector4::Vector4() {
@@ -9,14 +9,14 @@ Vector4::Vector4() {
 	this->w = 0;
 }
 
-Vector4::Vector4(_float x, _float y, _float z, _float w) {
+Vector4::Vector4(float x, float y, float z, float w) {
 	this->x = x;
 	this->y = y;
 	this->z = z;
 	this->w = w;
 }
 
-Vector4::Vector4(Vector3 const &v, _float w) {
+Vector4::Vector4(Vector3 const &v, float w) {
 	this->x = v.x;
 	this->y = v.y;
 	this->z = v.z;
@@ -68,7 +68,7 @@ Vector4	Vector4::operator-() const {
 	return (ret);
 }
 
-Vector4	Vector4::operator*(_float f) const {
+Vector4	Vector4::operator*(float f) const {
 	Vector4	ret;
 
 	ret.x = this->x * f;
@@ -78,11 +78,11 @@ Vector4	Vector4::operator*(_float f) const {
 	return (ret);
 }
 
-_float	Vector4::operator*(const Vector4 &ref) const {
+float	Vector4::operator*(const Vector4 &ref) const {
 	return (ref.x * this->x + ref.y * this->y + ref.z * this->z + ref.w * this->w);
 }
 
-Vector4	Vector4::operator/(_float f) const {
+Vector4	Vector4::operator/(float f) const {
 	Vector4	ret;
 
 	ret.x = this->x / f;
@@ -92,16 +92,12 @@ Vector4	Vector4::operator/(_float f) const {
 	return (ret);
 }
 
-Vector4::operator	Color() const {
-	return (Color(this->x, this->y, this->z, this->w));
-}
-
-_float	Vector4::lengthSqr() const {
+float	Vector4::lengthSqr() const {
 	return (*this * *this);
 }
 
-_float	Vector4::length() const {
-	return ((this->lengthSqr()).sqrt());
+float	Vector4::length() const {
+	return (std::sqrt(this->lengthSqr()));
 }
 
 Vector4	Vector4::normalized() const {
