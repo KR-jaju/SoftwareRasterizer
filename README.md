@@ -55,7 +55,7 @@ Each demo is an independent CMake project with its own CMakeLists.txt. To build 
 
 ## Images
 ### Demo: hello_triangle
-![Image](https://github.com/user-attachments/assets/e09d6bee-0ccb-415e-b450-e8db2903be70)
+![Image](https://github.com/user-attachments/assets/72e6bf00-c4bf-4197-89cc-085c9a610759)
 ### Demo: rotating_cube
 ![Image](https://github.com/user-attachments/assets/b04c3daf-5858-47b2-9799-0d682c62ad63)
 

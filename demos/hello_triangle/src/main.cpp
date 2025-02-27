@@ -119,7 +119,7 @@ int main(int argc, char* argv[])
         rasterizer.setPixelShader(pixelShader);
         rasterizer.setViewport(0, 0, WIDTH, HEIGHT);
         rasterizer.setDepthRange(0.0f, 1.0f);
-        rasterizer.setRenderTarget(pixel_buffer);
+        rasterizer.setRenderTarget(pixel_buffer, nullptr);
 
         rasterizer.clear(0);
         rasterizer.draw(0, 3);

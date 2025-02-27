@@ -27,9 +27,10 @@ public:
 	//PS
 	void	setPixelShader(PixelShader const& pixel_shader);
 	//OM
-	void	setRenderTarget(PSOut* render_target);
+	void	setRenderTarget(PSOut* render_target, float* depth_buffer);
 
 	void	clear(PSOut const& value);
+	void	clearDepth(float value);
 	void	draw(uint32_t offset, uint32_t count);
 private:
 	VSIn const*	vertex_buffer;
@@ -42,6 +43,7 @@ private:
 	float	far;
 
 	PSOut*	render_target;
+	float*	depth_buffer;
 	VertexShader vertex_shader;
 	PixelShader	pixel_shader;
 	std::vector<std::pair<VSOut, uint32_t>> post_transform_cache;
@@ -94,15 +96,22 @@ void Rasterizer<VSIn, VSOut, PSOut>::setPixelShader(PixelShader const& pixel_sha
 }
 
 template <typename VSIn, typename VSOut, typename PSOut>
-void	Rasterizer<VSIn, VSOut, PSOut>::setRenderTarget(PSOut* render_target)
+void	Rasterizer<VSIn, VSOut, PSOut>::setRenderTarget(PSOut* render_target, float* depth_buffer)
 {
 	this->render_target = render_target;
+	this->depth_buffer = depth_buffer;
 }
 
 template <typename VSIn, typename VSOut, typename PSOut>
 void	Rasterizer<VSIn, VSOut, PSOut>::clear(PSOut const& value)
 {
 	std::fill_n(this->render_target, this->w * this->h, value);
+}
+
+template <typename VSIn, typename VSOut, typename PSOut>
+void	Rasterizer<VSIn, VSOut, PSOut>::clearDepth(float value)
+{
+	std::fill_n(this->depth_buffer, this->w * this->h, value);
 }
 
 template <typename VSIn, typename VSOut, typename PSOut>
@@ -187,7 +196,19 @@ void	Rasterizer<VSIn, VSOut, PSOut>::drawTriangle(VSOut const& v0, VSOut const& 
 				0.0f, // w is not used
 				screen_v0.attrib * (pu * factor) + screen_v1.attrib * (pv * factor) + screen_v2.attrib * (pw * factor)
 			};
-			this->render_target[x + y * this->w] = this->pixel_shader(input);
+
+			if (this->depth_buffer != nullptr)
+			{
+				float& pixel_depth = this->depth_buffer[x + y * this->w];
+
+				if (input.z < pixel_depth)
+					continue;
+				pixel_depth = input.z;
+			}
+			if (this->render_target != nullptr)
+			{
+				this->render_target[x + y * this->w] = this->pixel_shader(input);
+			}
 		}
 	}
 }
@@ -201,60 +222,65 @@ uint32_t Rasterizer<VSIn, VSOut, PSOut>::clipTriangle(VSOut const& v0, VSOut con
 	out[0] = v0;
 	out[1] = v1;
 	out[2] = v2;
-	count = this->clip(out, clip_buffer, 3, [](VSOut const& v) { return (v.x + v.w) >= 0.0f; });
-	count = this->clip(out, clip_buffer, count, [](VSOut const& v) { return (v.w - v.x) >= 0.0f; });
-	count = this->clip(out, clip_buffer, count, [](VSOut const& v) { return (v.w - v.y) >= 0.0f; });
-	count = this->clip(out, clip_buffer, count, [](VSOut const& v) { return (v.y + v.w) >= 0.0f; });
-	count = this->clip(out, clip_buffer, count, [](VSOut const& v) { return (v.z + v.w) >= 0.0f; });
-	count = this->clip(out, clip_buffer, count, [](VSOut const& v) { return (v.w - v.z) >= 0.0f; });
+	count = this->clip(out, clip_buffer, 3, [](VSOut const& v) { return (v.x + v.w); });
+	count = this->clip(clip_buffer, out, count, [](VSOut const& v) { return (v.w - v.x); });
+	count = this->clip(out, clip_buffer, count, [](VSOut const& v) { return (v.w - v.y); });
+	count = this->clip(clip_buffer, out, count, [](VSOut const& v) { return (v.y + v.w); });
+	count = this->clip(out, clip_buffer, count, [](VSOut const& v) { return (v.z + v.w); });
+	count = this->clip(clip_buffer, out, count, [](VSOut const& v) { return (v.w - v.z); });
 	return (count);
 }
 
 template <typename VSIn, typename VSOut, typename PSOut>
-template <typename Pred>
+template <typename DistFunc>
 uint32_t Rasterizer<VSIn, VSOut, PSOut>::clip(
-	std::array<VSOut, 8> const& input,
-	std::array<VSOut, 8>& output,
-	uint32_t inCount, Pred const& inside)
+    std::array<VSOut, 8> const& input,
+    std::array<VSOut, 8>& output,
+    uint32_t in_count,
+    DistFunc const& dist_func
+)
 {
-	auto intersect = [](VSOut const& v0, VSOut const& v1) {
-		float p0 = (v0.x + v0.w);
-		float p1 = (v1.x + v1.w);
-		float t  = p0 / (p0 - p1);  // Sutherland–Hodgman 표준 공식
-		return VSOut {
-			v0.x * (1.0f - t) + v1.x * t,
-			v0.y * (1.0f - t) + v1.y * t,
-			v0.z * (1.0f - t) + v1.z * t,
-			v0.w * (1.0f - t) + v1.w * t,
-			v0.attrib * (1.0f - t) + v1.attrib * t,
-		};
-	};
+    auto intersect_func = [&](VSOut const& a, VSOut const& b) {
+        float da = dist_func(a);
+        float db = dist_func(b);
+        float t = da / (da - db);
+        VSOut r;
+        r.x = a.x + (b.x - a.x) * t;
+        r.y = a.y + (b.y - a.y) * t;
+        r.z = a.z + (b.z - a.z) * t;
+        r.w = a.w + (b.w - a.w) * t;
+        r.attrib = a.attrib * (1.0f - t) + b.attrib * t;
+        return r;
+    };
 
-	uint32_t outCount = 0;
-	for (uint32_t i = 0; i < inCount; ++i)
-	{
-		auto const& cur = input[i];
-		auto const& nxt = input[(i + 1) % inCount];
-		bool cIn = inside(cur);
-		bool nIn = inside(nxt);
+    uint32_t out_count = 0;
+    for (uint32_t i = 0; i < in_count; i++)
+    {
+        auto const& cur_vert = input[i];
+        auto const& nxt_vert = input[(i + 1) % in_count];
+        float da = dist_func(cur_vert);
+        float db = dist_func(nxt_vert);
+        bool cur_in = da >= 0.0f;
+        bool nxt_in = db >= 0.0f;
 
-		if (cIn && nIn)
-		{
-			output[outCount] = nxt;
-			outCount += 1;
-		}
-		else if (cIn && !nIn)
-		{
-			output[outCount] = intersect(cur, nxt);
-			outCount += 1;
-		}
-		else if (!cIn && nIn)
-		{
-			output[outCount] = intersect(cur, nxt);
-			outCount += 1;
-			output[outCount] = nxt;
-			outCount += 1;
-		}
-	}
-	return outCount;
+        if (cur_in && nxt_in)
+        {
+            output[out_count] = nxt_vert;
+			out_count += 1;
+        }
+        else if (cur_in && !nxt_in)
+        {
+            output[out_count] = intersect_func(cur_vert, nxt_vert);
+			out_count += 1;
+        }
+        else if (!cur_in && nxt_in)
+        {
+            output[out_count] = intersect_func(cur_vert, nxt_vert);
+			out_count += 1;
+            output[out_count] = nxt_vert;
+			out_count += 1;
+        }
+    }
+    return out_count;
 }
+

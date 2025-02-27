@@ -178,6 +178,8 @@ int main(int argc, char* argv[])
     bool quit = false;
     SDL_Event e;
 
+    float   depth_buffer[WIDTH * HEIGHT];
+
     while (!quit)
     {
         // 이벤트 처리
@@ -199,9 +201,10 @@ int main(int argc, char* argv[])
         rasterizer.setPixelShader(pixelShader);
         rasterizer.setViewport(0, 0, WIDTH, HEIGHT);
         rasterizer.setDepthRange(0.0f, 1.0f);
-        rasterizer.setRenderTarget(pixel_buffer);
+        rasterizer.setRenderTarget(pixel_buffer, depth_buffer);
 
         rasterizer.clear(0);
+        rasterizer.clearDepth(-1);
         rasterizer.draw(0, 36);
         window.update();
         SDL_Delay(16);
