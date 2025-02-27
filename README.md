@@ -54,6 +54,10 @@ Each demo is an independent CMake project with its own CMakeLists.txt. To build 
   Works on Windows, Linux, and macOS with standard C++ and no dependencies (only SDL2 for demos).
 
 ## Images
+### Demo: hello_triangle
+![Image](https://github.com/user-attachments/assets/e09d6bee-0ccb-415e-b450-e8db2903be70)
+### Demo: rotating_cube
+![Image](https://github.com/user-attachments/assets/b04c3daf-5858-47b2-9799-0d682c62ad63)
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

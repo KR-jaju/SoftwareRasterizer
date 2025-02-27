@@ -108,6 +108,7 @@ void	Rasterizer<VSIn, VSOut, PSOut>::clear(PSOut const& value)
 template <typename VSIn, typename VSOut, typename PSOut>
 void	Rasterizer<VSIn, VSOut, PSOut>::draw(uint32_t offset, uint32_t count)
 {
+	this->cache_generation += 1;
 	for (int v_id = 0; v_id + 3 <= count; v_id += 3)
 	{
 		uint32_t const v0_idx = this->index_buffer[offset + v_id];
